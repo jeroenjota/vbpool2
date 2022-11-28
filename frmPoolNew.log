@@ -1,0 +1,15 @@
+Line 40: Class MSComCtl2.UpDown of control upDnPerc was not a loaded control class.
+Line 63: Class MSMask.MaskEdBox of control txtHighestDayscore was not a loaded control class.
+Line 86: Class MSMask.MaskEdBox of control txtHighestPosition was not a loaded control class.
+Line 109: Class MSMask.MaskEdBox of control txtLowestPosition was not a loaded control class.
+Line 131: Class MSMask.MaskEdBox of control txtPercentage was not a loaded control class.
+Line 154: Class MSMask.MaskEdBox of control txtPrizeLastOverall was not a loaded control class.
+Line 177: Class MSMask.MaskEdBox of control txtPercentage was not a loaded control class.
+Line 200: Class MSComCtl2.UpDown of control upDnPerc was not a loaded control class.
+Line 223: Class MSMask.MaskEdBox of control txtPercentage was not a loaded control class.
+Line 246: Class MSComCtl2.UpDown of control upDnPerc was not a loaded control class.
+Line 269: Class MSMask.MaskEdBox of control txtPercentage was not a loaded control class.
+Line 292: Class MSComCtl2.UpDown of control upDnPerc was not a loaded control class.
+Line 433: Class MSMask.MaskEdBox of control txtCosts was not a loaded control class.
+Line 483: Class MSComCtl2.DTPicker of control dtpStart was not a loaded control class.
+Line 496: Class MSComCtl2.DTPicker of control dtpEind was not a loaded control class.

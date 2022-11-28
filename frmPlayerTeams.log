@@ -1,0 +1,12 @@
+Line 44: Class MSComctlLib.ListView of control lstPlayers was not a loaded control class.
+Line 50: The property name _ExtentX in lstPlayers is invalid.
+Line 51: The property name _ExtentY in lstPlayers is invalid.
+Line 52: The property name View in lstPlayers is invalid.
+Line 53: The property name Arrange in lstPlayers is invalid.
+Line 54: The property name MultiSelect in lstPlayers is invalid.
+Line 55: The property name LabelWrap in lstPlayers is invalid.
+Line 56: The property name HideSelection in lstPlayers is invalid.
+Line 57: The property name Checkboxes in lstPlayers is invalid.
+Line 58: The property name _Version in lstPlayers is invalid.
+Line 63: The property name NumItems in lstPlayers is invalid.
+Line 66: The property name ColumnHeader(1) in lstPlayers is invalid.
