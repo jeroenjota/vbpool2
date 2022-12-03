@@ -451,8 +451,8 @@ Dim thisTeam As Long
         frmGroupStands.Show 1
         'set the teams on positions 1 and 2 through to the finals
         Set8Finals cn
-        'if all groupmatches are played then ask for best 3rd places
-        If getLastMatchPlayed(cn) = getMatchCount(1, cn) Then
+        'if all groupmatches are played and there are 6 groups then ask for best 3rd places
+        If getLastMatchPlayed(cn) = getMatchCount(1, cn) And nz(getTournamentInfo("tournamentGroupCount", cn), 0) = 6 Then
           frm8Finals.Show 1
         End If
       End If

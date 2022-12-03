@@ -1173,7 +1173,7 @@ Sub updateGroupPositions(cn As ADODB.Connection)
     For grp = 0 To getTournamentInfo("tournamentGroupCount", cn) - 1
       sqlstr = "Select * from tblGroupLayout where tournamentId = " & thisTournament
       sqlstr = sqlstr & " AND groupLetter = '" & Chr(65 + grp) & "'"
-      sqlstr = sqlstr & " ORDER BY teamPoints DESC, (mScored-mAgainst) DESC, mAgainst ASC,mScored DESC,  groupPlace ASC"
+      sqlstr = sqlstr & " ORDER BY teamPoints DESC, (mScored-mAgainst) DESC, mScored DESC, groupPlace ASC"
       rs.Open sqlstr, cn, adOpenKeyset, adLockOptimistic
       If Not rs.EOF Then
         rs.MoveFirst

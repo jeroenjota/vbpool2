@@ -223,7 +223,6 @@ Begin VB.MDIForm frmMain
       End
       Begin VB.Menu mnuFillTestData 
          Caption         =   "&Test uitslagen"
-         Visible         =   0   'False
       End
       Begin VB.Menu mnuReset 
          Caption         =   "Reset wedstrijdenuitslagen"
@@ -374,6 +373,7 @@ Sub updateForm()
     Me.mnuPoolCompetitors.Enabled = thisPool > 0
     Me.mnuDblPlayers.Visible = adminLogin 'just for admin
     Me.mnuConvert.Visible = adminLogin 'just for admin
+    Me.mnuFillTestData.Visible = adminLogin
     
 '    Me.mnuEditTournaments.Visible = adminLogin
 '    Me.mnuNewTournament.Visible = adminLogin

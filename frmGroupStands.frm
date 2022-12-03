@@ -257,19 +257,19 @@ Dim yPos As Integer
   With Me.grdGroup(Index)
     .Visible = True
     sqlstr = sqlstr & " AND groupLetter = '" & Chr(65 + Index) & "'"
-    sqlstr = sqlstr & " ORDER BY teamposition, groupPlace"
+    sqlstr = sqlstr & " ORDER BY teamposition, groupPlace, mScored-mAgainst, mscored"
     rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
     .width = 1500
     For cl = 0 To rs.Fields.Count - 1
       .TextMatrix(0, cl) = rs.Fields(cl).Name
-      .colWidth(cl) = 360
-      .width = .width + .colWidth(cl)
+      .colwidth(cl) = 360
+      .width = .width + .colwidth(cl)
       .ColAlignment(cl) = flexAlignCenterCenter
     Next
     If Index > 0 Then
       .width = Me.grdGroup(0).width
     End If
-    .colWidth(1) = 1500
+    .colwidth(1) = 1500
     .ColAlignment(1) = flexAlignLeftCenter
     rw = 0
     Do While Not rs.EOF
