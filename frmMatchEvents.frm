@@ -606,8 +606,10 @@ End Sub
 
 Sub updateShootOut()
 'get the penaty shootout results
-'  Me.UpDnPenals(0) = nz(getMatchResult(thisMatch, 11, cn), 0)
-'  Me.UpDnPenals(1) = nz(getMatchResult(thisMatch, 12, cn), 0)
+  Me.UpDnPenals(0) = nz(getMatchresult(thisMatch, 11, cn), 0)
+  Me.UpDnPenals(1) = nz(getMatchresult(thisMatch, 12, cn), 0)
+'  pns(0) = Me.UpDnPenals(0)
+'  pns(1) = Me.UpDnPenals(1)
 End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)

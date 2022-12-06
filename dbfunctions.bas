@@ -1167,13 +1167,13 @@ Set rs = New ADODB.Recordset
     Set rs = Nothing
 End Function
 
-Function getPredictionDayGoals(poolFormID As Long, matchDate As Date, cn As ADODB.Connection)
+Function getPredictionDayGoals(poolformID As Long, matchDate As Date, cn As ADODB.Connection)
 'find the total of predicted goals for this poolform on macthDate
   Dim rs As ADODB.Recordset
   Dim sqlstr As String
   Set rs = New ADODB.Recordset
     sqlstr = "SELECT SUM(ftA+ftB) as ttlGoals from tblPrediction_MatchResults"
-    sqlstr = sqlstr & " WHERE competitorPoolID = " & poolFormID
+    sqlstr = sqlstr & " WHERE competitorPoolID = " & poolformID
     sqlstr = sqlstr & " AND matchNumber IN ("
     sqlstr = sqlstr & " SELECT matchNumber from tblTournamentSchedule "
     sqlstr = sqlstr & " WHERE clng(matchDate) = " & CLng(matchDate) & ")"
@@ -1208,12 +1208,12 @@ Dim rs As ADODB.Recordset
   Set rs = Nothing
 End Function
 
-Function getPredictionGoalsPerDay(poolFormID As Long, matchDate As Date, cn)
+Function getPredictionGoalsPerDay(poolformID As Long, matchDate As Date, cn)
 Dim sqlstr As String
 Dim rs As ADODB.Recordset
   Set rs = New ADODB.Recordset
   sqlstr = "Select sum(ftA) as A, sum(ftB) as B from tblPrediction_Matchresults"
-  sqlstr = sqlstr & " WHERE competitorPoolId = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPoolId = " & poolformID
   sqlstr = sqlstr & " AND matchOrder IN "
   sqlstr = sqlstr & " (Select matchOrder from tblTournamentSchedule WHERE "
   sqlstr = sqlstr & " tournamentID = " & thisTournament
@@ -1452,13 +1452,13 @@ Function getMatchResultPartStr(matchOrder As Integer, part As Integer, cn As ADO
 
 End Function
 
-Function getTotalPointsPrevDay(poolFormID As Long, matchOrder As Integer, cn As ADODB.Connection)
+Function getTotalPointsPrevDay(poolformID As Long, matchOrder As Integer, cn As ADODB.Connection)
 Dim rs As New ADODB.Recordset
 Dim sqlstr As String
 Dim savdat As Date
   savdat = getMatchInfo(matchOrder, "matchDate", cn)
   sqlstr = "Select SUM(pointsDay) as ttl from tblCompetitorPoints"
-  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolformID
   sqlstr = sqlstr & " AND matchOrder in (Select matchOrder from tblTournamentSchedule"
   sqlstr = sqlstr & " WHERE cdbl(matchDate) < " & CDbl(savdat)
   sqlstr = sqlstr & " AND tournamentID = " & thisTournament & ")"
@@ -1513,7 +1513,7 @@ Function getMoneyTotal(poolForm As Long, matchOrder As Integer, cn As ADODB.Conn
   Set rs = Nothing
 End Function
 
-Function getFin8Points(poolFormID As Long, tillMatch As Integer, grp As String, cn As ADODB.Connection)
+Function getFin8Points(poolformID As Long, tillMatch As Integer, grp As String, cn As ADODB.Connection)
 'sum the points for the 8th final teams group by group
 'Becauuse of the 3rd places that are calculateted after last group match we have to do this seperately
   Dim rs As ADODB.Recordset
@@ -1522,7 +1522,7 @@ Function getFin8Points(poolFormID As Long, tillMatch As Integer, grp As String, 
   Dim pnts As Integer
   
   sqlstr = "Select SUM(pointsTeamsFinals8" & grp & ") AS ttl from tblCompetitorPoints"
-  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolformID
   sqlstr = sqlstr & " AND matchorder <= " & tillMatch
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   If Not rs.EOF Then
@@ -1535,7 +1535,7 @@ Function getFin8Points(poolFormID As Long, tillMatch As Integer, grp As String, 
 
 End Function
 
-Function getPoolFormPoints(poolFormID As Long, matchOrder As Integer, ptsType As Integer, cn As ADODB.Connection, Optional grp As String)
+Function getPoolFormPoints(poolformID As Long, matchOrder As Integer, ptsType As Integer, cn As ADODB.Connection, Optional grp As String)
 '0: competitorPoolID; 1: matchNumber ; 2: ptsDayGoals ; 3: ptsHt ; 4: ptsFt ; 5: ptsToto; 6: ptsMatch;
 '7: pointsGroupStanding; 8: pointsGrpA; 9: pointsGrpB; 10: pointsGrpC; 11: pointsGrpD;
 '12: pointsGrpE; 13: pointsGrpF; 14: pointsGrpG; 15: pointsGrpH;
@@ -1556,7 +1556,7 @@ Function getPoolFormPoints(poolFormID As Long, matchOrder As Integer, ptsType As
   Dim pnts As Integer
   
   sqlstr = "Select * from tblCompetitorPoints"
-  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolformID
   If ptsType > 7 And ptsType < 41 And ptsType <> 16 And ptsType <> 25 And ptsType <> 30 Then
   ' then we add the points for the selected field
     sqlstr = sqlstr & " AND matchOrder <= " & matchOrder
@@ -1874,7 +1874,7 @@ Function getLastPoolFormPosition(afterMatch As Integer, cn As ADODB.Connection)
   Set rs = Nothing
 End Function
 
-Function getPoolFormEndPoints(poolFormID As Long, pl As Integer, cn As ADODB.Connection)
+Function getPoolFormEndPoints(poolformID As Long, pl As Integer, cn As ADODB.Connection)
 'haal de punten voor de eindstand op
 Dim rs As New ADODB.Recordset
 Dim sqlstr As String
@@ -1889,7 +1889,7 @@ Dim i As Integer
 
   sqlstr = "Select * from tblCompetitorPools WHERE"
   sqlstr = sqlstr & " poolid = " & thisPool
-  sqlstr = sqlstr & " AND competitorpoolid = " & poolFormID
+  sqlstr = sqlstr & " AND competitorpoolid = " & poolformID
   rs.Open sqlstr, cn, adOpenStatic, adLockReadOnly
   
   finMatch = getFinalmatchOrder(4, True, cn)
@@ -1953,7 +1953,7 @@ Dim i As Integer
   getPoolFormEndPoints = deelnpnt(pl)
 End Function
 
-Function getTotalGroupTtl(poolFormID As Long, matchNr As Integer, ptsType As Integer, fldCnt As Integer, cn As ADODB.Connection)
+Function getTotalGroupTtl(poolformID As Long, matchNr As Integer, ptsType As Integer, fldCnt As Integer, cn As ADODB.Connection)
 'returns the totalpoints for the subfields up till current match
 'to put into the table, makes it easier later
 'So input:
@@ -1966,7 +1966,7 @@ Function getTotalGroupTtl(poolFormID As Long, matchNr As Integer, ptsType As Int
   Dim i As Integer
   Dim sqlstr As String
   sqlstr = "Select * from tblCompetitorPoints "
-  sqlstr = sqlstr & " WHERE competitorPoolId = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPoolId = " & poolformID
   sqlstr = sqlstr & " AND matchOrder >= " & matchNr  'matchnr and matchorder zijn hier nog verwisseld
   sqlstr = sqlstr & " AND matchOrder < " & getFirstFinalMatchNumber(cn)
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
@@ -1979,6 +1979,23 @@ Function getTotalGroupTtl(poolFormID As Long, matchNr As Integer, ptsType As Int
   getTotalGroupTtl = ttl
   rs.Close
   Set rs = Nothing
+End Function
+
+Function getTotalPointsForFieldUntilMatch(poolformID As Long, tillMatch As Integer, fieldName As String, cn As ADODB.Connection)
+'returns the sum of points in fieldName till tillMatch number for poolformID
+Dim sqlstr As String
+Dim rs As ADODB.Recordset
+Set rs = New ADODB.Recordset
+sqlstr = "Select sum(" & fieldName & ") as ttl from tblCompetitorPoints "
+sqlstr = sqlstr & " WHERE competitorPoolID = " & poolformID
+sqlstr = sqlstr & " AND matchOrder <= " & tillMatch
+rs.Open sqlstr, cn, adOpenKeyset, adLockOptimistic
+If Not rs.EOF Then
+  getTotalPointsForFieldUntilMatch = rs!ttl
+Else
+  getTotalPointsForFieldUntilMatch = 0
+End If
+
 End Function
 
 Function getmatchOrderfromCode(teamCode As String, cn As ADODB.Connection)
@@ -2000,7 +2017,7 @@ Function getmatchOrderfromCode(teamCode As String, cn As ADODB.Connection)
 End Function
 
 
-Function getMatchPts(poolFormID As Long, matchOrder As Integer, scorePart As Integer, cn As ADODB.Connection)
+Function getMatchPts(poolformID As Long, matchOrder As Integer, scorePart As Integer, cn As ADODB.Connection)
 'matchresults
 Dim poolPts As Integer
 Dim sqlstr As String
@@ -2014,7 +2031,7 @@ Dim rsR As ADODB.Recordset
 Dim rsP As ADODB.Recordset
   Set rsP = New ADODB.Recordset
   sqlstr = "Select * from tblPrediction_MatchResults "
-  sqlstr = sqlstr & "where competitorPoolid = " & poolFormID
+  sqlstr = sqlstr & "where competitorPoolid = " & poolformID
   sqlstr = sqlstr & " AND matchOrder = " & matchOrder
   rsP.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   
@@ -2045,7 +2062,7 @@ Dim rsP As ADODB.Recordset
 End Function
 
 
-Function getGroupPoints(poolFormID As Long, grp As String, cn As ADODB.Connection)
+Function getGroupPoints(poolformID As Long, grp As String, cn As ADODB.Connection)
 'get the points for the group standings
 Dim rsForm As ADODB.Recordset
 Dim rsGrp As ADODB.Recordset
@@ -2058,7 +2075,7 @@ Dim i As Integer
   ttlPts = 0
   pts = getPointsFor("groepstand", cn)
   Set rsForm = New ADODB.Recordset
-  sqlstr = "Select * from tblPredictionGroupResults WHERE competitorPoolID = " & poolFormID
+  sqlstr = "Select * from tblPredictionGroupResults WHERE competitorPoolID = " & poolformID
   sqlstr = sqlstr & " AND groupletter = '" & grp & "'"
   rsForm.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   Set rsGrp = New ADODB.Recordset
@@ -2084,7 +2101,7 @@ Dim i As Integer
   Set rsGrp = Nothing
 End Function
 
-Function getPoolFormFinal8Points(poolFormID As Long, grp As String, cn As ADODB.Connection)
+Function getPoolFormFinal8Points(poolformID As Long, grp As String, cn As ADODB.Connection)
 Dim sqlstr As String
 Dim rs As ADODB.Recordset
 Set rs = New ADODB.Recordset
@@ -2130,7 +2147,7 @@ Dim onPosition As Boolean
       End
     End If
   '4 Zoek in de tblPredictions_Finals naar de teamID in kolom teamnameA of B
-    sqlstr = "Select * from tblPrediction_Finals WHERE competitorpoolID = " & poolFormID
+    sqlstr = "Select * from tblPrediction_Finals WHERE competitorpoolID = " & poolformID
     sqlstr = sqlstr & " AND matchOrder Between " & matchNrFirst & " AND " & matchNrLast
     sqlstr = sqlstr & " AND (teamNameA = " & teamID & " OR teamNameB = " & teamID & ")"
     rsForm.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
@@ -2169,7 +2186,7 @@ Dim onPosition As Boolean
       End
     End If
   '4 Zoek in de tblPredictions_Finals naar de teamID in kolom teamnameA of B
-    sqlstr = "Select * from tblPrediction_Finals WHERE competitorpoolID = " & poolFormID
+    sqlstr = "Select * from tblPrediction_Finals WHERE competitorpoolID = " & poolformID
     sqlstr = sqlstr & " AND matchOrder Between " & matchNrFirst & " AND " & matchNrLast
     sqlstr = sqlstr & " AND (teamNameA = " & teamID & " OR teamNameB = " & teamID & ")"
     rsForm.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
@@ -2442,7 +2459,7 @@ End Function
 '
 'End Function
 
-Function getTournamentStandingPoints(poolFormID As Long, cn As ADODB.Connection)
+Function getTournamentStandingPoints(poolformID As Long, cn As ADODB.Connection)
 Dim rs As ADODB.Recordset
 Dim sqlstr As String
 Dim pts As Integer
@@ -2456,7 +2473,7 @@ Dim podiumPlaces As Integer
 
   sqlstr = "SELECT * FROM competitorPools "
   sqlstr = sqlstr & " WHERE poolID = " & thisPool
-  sqlstr = sqlstr & " AND competitorID = " & poolFormID
+  sqlstr = sqlstr & " AND competitorID = " & poolformID
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   pts = 0
   With rs
@@ -2510,7 +2527,7 @@ Function getTournamentFinalTeam(place As Integer, cn As ADODB.Connection)
 End Function
 
 
-Function getPoolFormTopScoresPoints(poolFormID As Long, cn As ADODB.Connection)
+Function getPoolFormTopScoresPoints(poolformID As Long, cn As ADODB.Connection)
 Dim rs As ADODB.Recordset
 Dim rsTS As ADODB.Recordset
 
@@ -2526,7 +2543,7 @@ Set rsTS = New ADODB.Recordset
   pts(1) = getPointsForID(21, cn)
   pts(2) = getPointsForID(24, cn)
   sqlstr = "Select * from tblPredictionTopscorers "
-  sqlstr = sqlstr & " WHERE competitorPololID = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPololID = " & poolformID
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
     
   sqlstr = "SELECT playerID, count(playerID)  as aantal from tblMatchEvents"
@@ -2550,7 +2567,7 @@ Set rs = Nothing
 
 End Function
 
-Function getStatsPointsFor(statType As Integer, poolFormID As Long, cn As ADODB.Connection)
+Function getStatsPointsFor(statType As Integer, poolformID As Long, cn As ADODB.Connection)
 'get the points for the specific stattype
 Dim rs As ADODB.Recordset
 Dim sqlstr As String
@@ -2563,7 +2580,7 @@ Dim matchOrdrNr As Integer
   realStat = getStatistics(matchOrdrNr, statType, cn)
   marge = getMarginForID(CLng(statType), cn)
   sqlstr = "Select * from tblPrediction_Numbers "
-  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolFormID
+  sqlstr = sqlstr & " WHERE competitorPoolID = " & poolformID
   sqlstr = sqlstr & " AND predictionTypeID = " & statType
   Set rs = New ADODB.Recordset
   With rs
@@ -2580,7 +2597,7 @@ Dim matchOrdrNr As Integer
   getStatsPointsFor = retPts
 End Function
 
-Function getStatsPoints(poolFormID As Long, cn As ADODB.Connection)
+Function getStatsPoints(poolformID As Long, cn As ADODB.Connection)
 Dim rsDeeln As ADODB.Recordset
 Dim sqlstr As String
 Dim dp As Integer
@@ -2597,7 +2614,7 @@ Set rsDeeln = New ADODB.Recordset
 Dim statPnt(5) As Integer
 
 sqlstr = "Select * from tblPrediction_Numbers "
-sqlstr = sqlstr & " WHERE competitorIPoolID = " & poolFormID
+sqlstr = sqlstr & " WHERE competitorIPoolID = " & poolformID
 rsDeeln.Open sqlstr, cn, adOpenStatic, adLockReadOnly
 wd = getLastMatchPlayed(cn) 'returns matchOrder
 dp = getStatistics(wd, doelp, cn) + getStatistics(wd, penalty, cn) + getStatistics(wd, eigdoelp, cn)
@@ -2669,7 +2686,7 @@ getStatsPoints = deelnpnt
 End Function
 
 
-Function getTotalThisDayPoints(poolFormID As Long, matchNr As Integer, cn As ADODB.Connection)
+Function getTotalThisDayPoints(poolformID As Long, matchNr As Integer, cn As ADODB.Connection)
 Dim rs As New ADODB.Recordset
 Dim rsPnt As New ADODB.Recordset
 Dim sqlstr As String
@@ -2684,7 +2701,7 @@ Dim pnt As Integer
     Do While Not rs.EOF
       sqlstr = "Select pointsDay from tblCompetitorPoints"
       sqlstr = sqlstr & " WHERE matchOrder = " & rs!matchOrder
-      sqlstr = sqlstr & " AND competitorPoolID = " & poolFormID
+      sqlstr = sqlstr & " AND competitorPoolID = " & poolformID
       rsPnt.Open sqlstr, cn, adOpenStatic, adLockReadOnly
       If rsPnt.RecordCount > 0 Then
         pnt = pnt + rsPnt!pointsDay

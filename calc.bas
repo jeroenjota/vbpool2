@@ -117,7 +117,7 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
   'we have changed all references to matchnumber to matchOrder, which is also the ordernumber of the match
   'get the date of this match
   savdat = getMatchInfo(matchOrder, "matchDate", cn)
-  'the following 2 'get' functions return an array with teams / teamcodes
+  'the following 2 'get'functions return an array with teams / teamcodes
   teamCode = getMatchTeamCodes(matchOrder, cn)
   team = getScheduleTeamNames(matchOrder, cn)
   teamID(1) = getTeamIdFromCode(teamCode(0), cn)
@@ -133,6 +133,7 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
   Do While Not rs.EOF
     
     thisForm = rs!competitorPoolID
+    'If thisForm = 74 Then Stop
     poolFormName = rs!nickName & " (" & rs.AbsolutePosition & "/" & rs.RecordCount & ")"
     'show some info
     showInfo True, "Punten tellen", "Na " & matchOrder & "e wedstrijd (nr " & matchNr & "): " & team(0) & " - " & team(1), poolFormName
@@ -390,11 +391,11 @@ Dim matchNr As Integer
   Case 52
     'the quarter final match number and home or away
     finmatchOrder = 59
-    leftTeam = True
+    leftTeam = False
     grp = "D"
   Case 51
     finmatchOrder = 59
-    leftTeam = False
+    leftTeam = True
     grp = "D"
   Case 53
     'the quarter final match number and home or away
@@ -409,11 +410,11 @@ Dim matchNr As Integer
     'the quarter final match number and home or away
     finmatchOrder = 60
     leftTeam = True
-    grp = "D"
+    grp = "C"
   Case 56
     finmatchOrder = 60
     leftTeam = False
-    grp = "D"
+    grp = "C"
   End Select
   sqlstr = "Select * from tblTournamentTeamCodes "
   sqlstr = sqlstr & " WHERE tournamentID = " & thisTournament
@@ -452,7 +453,7 @@ Dim matchNr As Integer
   Set rs = Nothing
   sqlstr = "UPDATE tblCompetitorPoints SET pointsTeamsFinals4" & grp
   sqlstr = sqlstr & "= " & ttlPts
-  'copy values from previous match for reposrts later
+  'copy values from previous match for reports later
   sqlstr = sqlstr & ", pointsGroupStanding = " & getPoolFormPoints(thisForm, matchOrder - 1, 7, cn)
   sqlstr = sqlstr & ", pointsFinals_8 = " & getPoolFormPoints(thisForm, matchOrder - 1, 16, cn)
   'set the total field for quarter matches
@@ -493,7 +494,7 @@ matchNr = getMatchNumber(matchOrder, cn)
     leftTeam = False
     grp = "B"
   Case 59
-    finmatchOrder = 63
+    finmatchOrder = 62
     leftTeam = True
     grp = "B"
   End Select
@@ -959,9 +960,9 @@ Sub updatePoolPositions(matchOrder As Integer, cn As ADODB.Connection)
     oldPos = 0
     Do While Not .EOF
       pos = pos + 1
-      If oldPnt <> !pointsgrandTotal Then
+      If oldPnt <> !pointsGrandTotal Then
         oldPos = pos
-        oldPnt = !pointsgrandTotal
+        oldPnt = !pointsGrandTotal
       End If
       !positionTotal = oldPos
       .Update
@@ -1294,7 +1295,7 @@ Dim finMatch(4) As Integer 'save the matchnumbers where the 3rd places are going
           rs!pointsFinals_8 = rs!pointsFinals_8 + points
           rs!pointsDay = rs!pointsDay + points
           rs!pointsDayTotal = rs!pointsDayTotal + points
-          rs!pointsgrandTotal = rs!pointsgrandTotal + points
+          rs!pointsGrandTotal = rs!pointsGrandTotal + points
         End If
       Next
     End If

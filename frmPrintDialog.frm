@@ -47,7 +47,7 @@ Begin VB.Form frmPrintDialog
       ScaleHeight     =   2505
       ScaleWidth      =   3315
       TabIndex        =   34
-      Top             =   2040
+      Top             =   1920
       Width           =   3345
       Begin VB.ListBox lstCompetitorPools 
          Height          =   1980
@@ -146,7 +146,7 @@ Begin VB.Form frmPrintDialog
       ScaleHeight     =   1575
       ScaleWidth      =   3435
       TabIndex        =   14
-      Top             =   2760
+      Top             =   2880
       Width           =   3465
       Begin MSComCtl2.UpDown upDnCopies 
          Height          =   375
@@ -510,14 +510,27 @@ Begin VB.Form frmPrintDialog
          Strikethrough   =   0   'False
       EndProperty
       ForeColor       =   &H80000008&
-      Height          =   4275
+      Height          =   4395
       Left            =   75
-      ScaleHeight     =   4245
+      ScaleHeight     =   4365
       ScaleWidth      =   2850
       TabIndex        =   0
       Tag             =   "afdruk"
       Top             =   90
       Width           =   2880
+      Begin VB.OptionButton optPrintDoc 
+         Appearance      =   0  'Flat
+         Caption         =   "Plaats per dag"
+         ForeColor       =   &H00004000&
+         Height          =   315
+         Index           =   10
+         Left            =   90
+         TabIndex        =   48
+         ToolTipText     =   "Druk per deelnemer per dag de positie in de pool af"
+         Top             =   3678
+         Visible         =   0   'False
+         Width           =   2670
+      End
       Begin VB.OptionButton optPrintDoc 
          Appearance      =   0  'Flat
          Caption         =   "Dagresultaat"
@@ -526,7 +539,7 @@ Begin VB.Form frmPrintDialog
          Index           =   9
          Left            =   90
          TabIndex        =   42
-         Top             =   1709
+         Top             =   1693
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -538,7 +551,7 @@ Begin VB.Form frmPrintDialog
          Index           =   5
          Left            =   90
          TabIndex        =   26
-         Top             =   2511
+         Top             =   2487
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -549,7 +562,7 @@ Begin VB.Form frmPrintDialog
          Index           =   3
          Left            =   90
          TabIndex        =   25
-         Top             =   1308
+         Top             =   1296
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -561,7 +574,7 @@ Begin VB.Form frmPrintDialog
          Index           =   6
          Left            =   90
          TabIndex        =   24
-         Top             =   2912
+         Top             =   2884
          Value           =   -1  'True
          Width           =   2670
       End
@@ -573,7 +586,7 @@ Begin VB.Form frmPrintDialog
          Index           =   4
          Left            =   90
          TabIndex        =   23
-         Top             =   2110
+         Top             =   2090
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -595,7 +608,7 @@ Begin VB.Form frmPrintDialog
          Index           =   1
          Left            =   90
          TabIndex        =   4
-         Top             =   506
+         Top             =   502
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -606,7 +619,7 @@ Begin VB.Form frmPrintDialog
          Index           =   8
          Left            =   90
          TabIndex        =   3
-         Top             =   3720
+         Top             =   3840
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -617,7 +630,7 @@ Begin VB.Form frmPrintDialog
          Index           =   7
          Left            =   90
          TabIndex        =   2
-         Top             =   3313
+         Top             =   3281
          Width           =   2670
       End
       Begin VB.OptionButton optPrintDoc 
@@ -628,7 +641,7 @@ Begin VB.Form frmPrintDialog
          Index           =   2
          Left            =   90
          TabIndex        =   1
-         Top             =   907
+         Top             =   899
          Width           =   2670
       End
    End
@@ -950,6 +963,23 @@ Select Case Index
     Me.poolFormOrder(0) = True
     toMatch = Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex)
     DoEvents
+    
+  Case 10
+    'place per day after match  NEW Dec 2022
+    Me.picVolgorde.Visible = False
+    Me.chkCombi.Enabled = False
+    picVoorWed.Visible = False
+    Me.optPortrait.value = True
+    Me.picCompetitorList.Visible = False
+    picToMatch.Visible = True
+    If toMatch > 0 Then
+      'Me.upDnToMatch = getLastMatchPlayed(cn)
+      setCombo Me.cmbMatchesPlayed, getLastMatchPlayed(cn)
+
+      'Me.upDnToMatch.SetFocus
+      toMatch = Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex)
+    End If
+    
   End Select
   
 End Sub
@@ -3345,8 +3375,8 @@ Dim msg As String
 Dim printTo As Integer
 'stand in toernooi
 
-  printTo = 1  'preview
-'  printTo = 0  'printer
+  'printTo = 1  'preview
+  printTo = 0  'printer
   Me.Hide
   Me.Show
    savdat = getMatchInfo(Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex), "matchdate", cn)
@@ -3556,7 +3586,7 @@ Dim curMatch As Integer
   Set rotater.Device = printObj ' used to print texts in an angle
   
   'which report are we printing
-  For i = 0 To 9
+  For i = 0 To 10
       If Me.optPrintDoc(i).value = True Then
           reportSelect = i
           Exit For
@@ -3596,6 +3626,9 @@ Dim curMatch As Integer
   Case 9
       'Dagresultaat
       printDailyResults Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex)
+  Case 10
+      'plaats per dag
+      'printPlaceAfterDay Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex)
   End Select
 
   'Picture1.Visible = True
@@ -3613,6 +3646,14 @@ Dim curMatch As Integer
   Set printObj = Nothing
   'Me.Show
 
+End Sub
+
+
+Sub printPlaceAfterDay(afterMatch As Integer)
+'print a table with names (vertical) and days (horizontal) to sho posittion after match afterMatch
+  Set rs = New ADODB.Recordset
+  Dim dayCount As Integer
+  MsgBox "Sorry deze doet het nog niet", vbOKOnly + vbInformation, "Plaats per dag"
 End Sub
 
 Sub printTournamentStandings(toMatch As Integer)
@@ -5870,7 +5911,7 @@ If Me.poolFormOrder(1) Then alfabet = False
   rs.Open getPoolFormSql(False, matchOrder), cn, adOpenStatic, adLockReadOnly
   If Not rs.EOF Then
     rs.MoveLast
-    lastPos = nz(rs!pointsgrandTotal, 0)
+    lastPos = nz(rs!pointsGrandTotal, 0)
   Else
     Exit Sub
   End If
@@ -5976,15 +6017,15 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
           End If
           printObj.CurrentX = printObj.CurrentX + colpos(0) - printObj.TextWidth(!positionTotal) - printObj.TextWidth("..") + col
           If Not alfabet Then
-            If lastTtl <> !pointsgrandTotal Then printObj.Print !positionTotal & ".";
+            If lastTtl <> !pointsGrandTotal Then printObj.Print !positionTotal & ".";
           End If
           printObj.FontBold = !positionTotal = 1
-          printObj.FontItalic = nz(!pointsgrandTotal, 0) = lastPos
+          printObj.FontItalic = nz(!pointsGrandTotal, 0) = lastPos
           prStr = Left(!nickName, 12)
           If alfabet Then
             prStr = prStr & " (" & !positionTotal & ")"
           End If
-          If !pointsgrandTotal = lastPos Then
+          If !pointsGrandTotal = lastPos Then
             printObj.ForeColor = vbRed
           ElseIf nz(!positionTotal, 0) = 1 Then
             printObj.ForeColor = vbBlue
@@ -6024,9 +6065,9 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
           printObj.ForeColor = 0
           printObj.FontUnderline = False
           printObj.FontBold = !positionTotal = 1
-          printObj.FontItalic = nz(!pointsgrandTotal, 0) = lastPos
-          pts = nz(!pointsgrandTotal, 0)
-          If !pointsgrandTotal = lastPos Then
+          printObj.FontItalic = nz(!pointsGrandTotal, 0) = lastPos
+          pts = nz(!pointsGrandTotal, 0)
+          If !pointsGrandTotal = lastPos Then
               printObj.ForeColor = vbRed
           ElseIf !positionTotal = 1 Then
               printObj.ForeColor = vbBlue
@@ -6034,14 +6075,14 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
               printObj.ForeColor = 0
           End If
           printObj.CurrentX = colpos(3) + col + printObj.TextWidth("999") - printObj.TextWidth(CStr(pts))
-          If !pointsgrandTotal = lastPos Then
+          If !pointsGrandTotal = lastPos Then
               printObj.ForeColor = &H80&
           ElseIf !positionTotal = 1 Then
               printObj.ForeColor = &HC00000
           Else
               printObj.ForeColor = 0
           End If
-          printObj.Print Format(!pointsgrandTotal, "##0");
+          printObj.Print Format(!pointsGrandTotal, "##0");
           printObj.ForeColor = 0
           printObj.FontBold = False
           printObj.FontItalic = False
@@ -6056,7 +6097,7 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
           printObj.CurrentX = colpos(6) - printObj.TextWidth(tmp) + col
           printObj.Print tmp;   '= geld
           printObj.Print
-          lastTtl = nz(!pointsgrandTotal, 0)
+          lastTtl = nz(!pointsGrandTotal, 0)
           rs.MoveNext
         Loop
         curYpos = printObj.CurrentY
@@ -6297,11 +6338,11 @@ Dim infostr As String
   printObj.CurrentX = posX(UBound(posX))
   headCnt = headCnt + 1
   ReDim Preserve headTxt(headCnt)
-  headTxt(headCnt) = " groepstnd"
+  headTxt(headCnt) = " groepstanden"
   rotater.PrintText headTxt(headCnt)
   
   If getTournamentInfo("tournamentgroupCount", cn) > 4 Then
-    xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+    xPos = printObj.CurrentX + printObj.TextWidth("199") * colWidthFactor
     ReDim Preserve posX(UBound(posX) + 1)
     posX(UBound(posX)) = xPos
     rotater.Angle = 90
@@ -6311,7 +6352,7 @@ Dim infostr As String
     headTxt(headCnt) = " 8e Finales"
     rotater.PrintText headTxt(headCnt)
   End If
-  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+  xPos = printObj.CurrentX + printObj.TextWidth("199") * colWidthFactor
   ReDim Preserve posX(UBound(posX) + 1)
   posX(UBound(posX)) = xPos
   rotater.Angle = 90
@@ -6467,19 +6508,23 @@ Dim infostr As String
         End If
         ttlColWidth = posX(UBound(posX) - 10) - posX(UBound(posX) - 11)
         If toMatch = getMatchCount(0, cn) Then pntFormat = "0"
-        printObj.CurrentX = posX(UBound(posX) - 11) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsGroupStanding, 0), pntFormat))) / 2
-        printObj.Print Format(nz(!pointsGroupStanding, 0), pntFormat);
+        grpTtl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsGroupStanding", cn)
+        fin8ttl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsFinals_8", cn)
+        fin4ttl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsFinals_4", cn)
+        fin2ttl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsFinals_2", cn)
+        printObj.CurrentX = posX(UBound(posX) - 11) + (ttlColWidth - printObj.TextWidth(Format(grpTtl, pntFormat))) / 2
+        printObj.Print Format(grpTtl, pntFormat);
         ttlColWidth = posX(UBound(posX) - 9) - posX(UBound(posX) - 10)
         If getTournamentInfo("tournamentGroupCount", cn) > 4 Then
-            printObj.CurrentX = posX(UBound(posX) - 10) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsFinals_8, 0), pntFormat))) / 2
-            printObj.Print Format(nz(!pointsFinals_8, 0), pntFormat);
+            printObj.CurrentX = posX(UBound(posX) - 10) + (ttlColWidth - printObj.TextWidth(Format(fin8ttl, pntFormat))) / 2
+            printObj.Print Format(fin8ttl, pntFormat);
             ttlColWidth = posX(UBound(posX) - 8) - posX(UBound(posX) - 9)
         End If
-        printObj.CurrentX = posX(UBound(posX) - 9) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsFinals_4, 0), pntFormat))) / 2
-        printObj.Print Format(nz(!pointsFinals_4, 0), pntFormat);
+        printObj.CurrentX = posX(UBound(posX) - 9) + (ttlColWidth - printObj.TextWidth(Format(fin4ttl, pntFormat))) / 2
+        printObj.Print Format(fin4ttl, pntFormat);
         ttlColWidth = posX(UBound(posX) - 7) - posX(UBound(posX) - 8)
-        printObj.CurrentX = posX(UBound(posX) - 8) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsFinals_2, 0), pntFormat))) / 2
-        printObj.Print Format(nz(!pointsFinals_2, 0), pntFormat);
+        printObj.CurrentX = posX(UBound(posX) - 8) + (ttlColWidth - printObj.TextWidth(Format(fin2ttl, pntFormat))) / 2
+        printObj.Print Format(fin2ttl, pntFormat);
         ttlColWidth = posX(UBound(posX) - 6) - posX(UBound(posX) - 7)
         printObj.CurrentX = posX(UBound(posX) - 7) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsFinal, 0) + nz(!pointsFinals_34, 0), pntFormat))) / 2
         printObj.Print Format(nz(!pointsFinal, 0) + nz(!pointsFinals_34, 0), pntFormat);
@@ -6493,8 +6538,8 @@ Dim infostr As String
         printObj.CurrentX = posX(UBound(posX) - 4) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsOther, 0) + nz(!pointsTopscorers, 0), pntFormat))) / 2
         printObj.Print Format(nz(!pointsOther, 0), pntFormat);
         ttlColWidth = posX(UBound(posX) - 2) - posX(UBound(posX) - 3)
-        printObj.CurrentX = posX(UBound(posX) - 3) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsgrandTotal, 0), pntFormat))) / 2
-        printObj.Print Format(nz(!pointsgrandTotal, 0), pntFormat);
+        printObj.CurrentX = posX(UBound(posX) - 3) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsGrandTotal, 0), pntFormat))) / 2
+        printObj.Print Format(nz(!pointsGrandTotal, 0), pntFormat);
         ttlColWidth = posX(UBound(posX) - 1) - posX(UBound(posX) - 2)
         printObj.CurrentX = posX(UBound(posX) - 2) + (ttlColWidth - printObj.TextWidth(Format(nz(!positionTotal, 0), pntFormat))) / 2
         printObj.Print Format(nz(!positionTotal, 0), pntFormat);
@@ -6807,7 +6852,7 @@ Dim sqlstr As String
   sqlstr = sqlstr & " AND matchOrder = " & matchNr
   rs.Open sqlstr, cn, adOpenStatic, adLockReadOnly
   If Not rs.EOF Then
-    getTotalPts = rs!pointsgrandTotal
+    getTotalPts = rs!pointsGrandTotal
   Else
     getTotalPts = 0
   End If
