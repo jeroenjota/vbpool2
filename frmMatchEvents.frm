@@ -311,7 +311,11 @@ Private Sub btnClosePenalties_Click()
     msg = msg & vbNewLine & "Mocht er geloot zijn of zo, geef dan het winnende team een extra penalty"
     MsgBox msg, vbInformation + vbOKOnly, "Geen winnaar?"
     Exit Sub
+  Else
+    pns(0) = Me.UpDnPenals(0)
+    pns(1) = Me.UpDnPenals(1)
   End If
+  
   Me.picPenalties.Visible = False
   fillGrid
 End Sub
@@ -501,6 +505,10 @@ Private Sub Form_Load()
       .ConnectionString = lclConn()
       .Open
   End With
+  pns(0) = nz(getMatchresult(thisMatch, 11, cn), 0)
+  pns(1) = nz(getMatchresult(thisMatch, 12, cn), 0)
+  Me.UpDnPenals(0) = pns(0)
+  Me.UpDnPenals(1) = pns(1)
   write2Log "Wedstrijd bijhouden " & getMatchDescription(thisMatch, cn, , , True), True
   initForm
   UnifyForm Me
@@ -570,10 +578,10 @@ Sub fillGrid()
     .Clear
     .rows = rs.RecordCount + 1
     .cols = rs.Fields.Count
-    .colwidth(0) = 450
-    .colwidth(1) = 2000
-    .colwidth(2) = 2900
-    .colwidth(3) = 900
+    .colWidth(0) = 450
+    .colWidth(1) = 2000
+    .colWidth(2) = 2900
+    .colWidth(3) = 900
     i = 0
     For J = 0 To rs.Fields.Count - 1
       If Not IsNull(rs.Fields(J).Name) Then
@@ -593,10 +601,13 @@ Sub fillGrid()
           .TextMatrix(i, J) = ""
         End If
       Next
+      If rs!mn > 120 Then
+        updateShootOut
+      End If
       rs.MoveNext
+      
     Loop
   End With
-  updateShootOut
   Me.grdMatchEvents.row = Me.grdMatchEvents.rows - 1
   grdMatchEvents_Click
   rs.Close
@@ -606,10 +617,10 @@ End Sub
 
 Sub updateShootOut()
 'get the penaty shootout results
-  Me.UpDnPenals(0) = nz(getMatchresult(thisMatch, 11, cn), 0)
-  Me.UpDnPenals(1) = nz(getMatchresult(thisMatch, 12, cn), 0)
-'  pns(0) = Me.UpDnPenals(0)
-'  pns(1) = Me.UpDnPenals(1)
+  'Me.UpDnPenals(0) = nz(getMatchresult(thisMatch, 11, cn), 0)
+  'Me.UpDnPenals(1) = nz(getMatchresult(thisMatch, 12, cn), 0)
+  'pns(0) = Me.UpDnPenals(0)
+  'pns(1) = Me.UpDnPenals(1)
 End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
@@ -692,6 +703,8 @@ Dim sqlstr As String
   ht(1) = 0
   xt(0) = 0
   xt(1) = 0
+  'pns(0) = 0
+  'pns(1) = 0
   With rs
     Me.lblStand = ""
     Me.lblOther = ""
@@ -736,6 +749,7 @@ Dim sqlstr As String
         cards(!eventID - 4) = cards(!eventID - 4) + 1
       Case 6
         pen = pen + 1
+      Case 7
       End Select
       .MoveNext
     Loop
@@ -748,6 +762,7 @@ Dim sqlstr As String
     If val(Me.grdMatchEvents.TextMatrix(Me.grdMatchEvents.rows - 1, 0)) > 90 Then
         txtStr = txtStr & " na verl: " & ft(0) + xt(0) & "-" & ft(1) + xt(1)
     End If
+    
     If pns(0) <> pns(1) Then
       If pns(0) > pns(1) Then
         txtStr = txtStr & vbNewLine & team(0)

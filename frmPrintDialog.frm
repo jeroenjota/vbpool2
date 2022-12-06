@@ -3373,13 +3373,16 @@ Dim savdat As Date
 Dim msg As String
 Dim printTo As Integer
 'stand in toernooi
-
-  'printTo = 1  'preview
-  printTo = 0  'printer
-  Me.Hide
-  Me.Show
-   savdat = getMatchInfo(Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex), "matchdate", cn)
- setCombo Me.cmbMatchesPlayed, getHighestDayMatchNr(savdat, cn)
+  If adminLogin Then
+    MsgBox "Rapporten worden naar Preview gestuurd, niet naar de printer"
+    printTo = 1  'preview
+  Else
+    printTo = 0  'printer
+  End If
+ ' Me.Hide
+  ' Me.Show
+  savdat = getMatchInfo(Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex), "matchdate", cn)
+  setCombo Me.cmbMatchesPlayed, getHighestDayMatchNr(savdat, cn)
   curWed = Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex)
   lastMatch = getLastMatchPlayed(cn) 'Returns the matchOrder number
   'Me.upDnToMatch.value = getHighestDayMatchNr(savdat, cn)
