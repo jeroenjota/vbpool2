@@ -3374,8 +3374,8 @@ Dim msg As String
 Dim printTo As Integer
 'stand in toernooi
 
-  printTo = 1  'preview
-  'printTo = 0  'printer
+  'printTo = 1  'preview
+  printTo = 0  'printer
   Me.Hide
   Me.Show
    savdat = getMatchInfo(Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex), "matchdate", cn)
@@ -3728,7 +3728,7 @@ Set rsDays = New ADODB.Recordset
     printObj.ForeColor = vbBlack
     printObj.Print rs!nickName;
     For col = 1 To dayCount
-        plts = nz(rs!positiontotal, 0)
+        plts = nz(rs!positionTotal, 0)
         If plts > 0 Then
           plStr = Format(plts, 0)
           printObj.ForeColor = vbBlack
@@ -5222,7 +5222,7 @@ Dim final8Pts(8) As Integer
     rs.Open sqlstr, cn, adOpenStatic, adLockReadOnly
     If rs.RecordCount > 0 Then
         rs.MoveLast
-        lastDeelnPos = rs!positiontotal
+        lastDeelnPos = rs!positionTotal
     End If
     rs.Close
     'now reset the recordset
@@ -5467,14 +5467,14 @@ Dim final8Pts(8) As Integer
     With rs
       Do While Not .EOF
         printObj.CurrentX = leftMargin
-        If !positiontotal = 1 Then
+        If !positionTotal = 1 Then
           printObj.ForeColor = vbBlue
           printObj.FontBold = True
         End If
-        If !positiontotal = lastDeelnPos Then
+        If !positionTotal = lastDeelnPos Then
           printObj.ForeColor = vbRed
         End If
-        printObj.Print !nickName; " (" & !positiontotal & ")";
+        printObj.Print !nickName; " (" & !positionTotal & ")";
         printObj.ForeColor = 1
         printObj.FontBold = False
         pnt = printAant(!competitorPoolID, pntPos(2), "ptsHt")
@@ -5653,11 +5653,11 @@ Dim final8Pts(8) As Integer
        End If
 '       'plaats en geld
        pntFormat = "0"
-       If !positiontotal = 1 Then
+       If !positionTotal = 1 Then
          printObj.ForeColor = vbBlue
          printObj.FontBold = True
        End If
-       If !positiontotal = lastDeelnPos Then
+       If !positionTotal = lastDeelnPos Then
          printObj.ForeColor = vbRed
        End If
        'If !competitorPoolId = 125 Then Stop
@@ -6133,19 +6133,19 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
             col = poolColWidth
             printObj.CurrentY = poolTopPos
           End If
-          printObj.CurrentX = printObj.CurrentX + colpos(0) - printObj.TextWidth(!positiontotal) - printObj.TextWidth("..") + col
+          printObj.CurrentX = printObj.CurrentX + colpos(0) - printObj.TextWidth(!positionTotal) - printObj.TextWidth("..") + col
           If Not alfabet Then
-            If lastTtl <> !pointsGrandTotal Then printObj.Print !positiontotal & ".";
+            If lastTtl <> !pointsGrandTotal Then printObj.Print !positionTotal & ".";
           End If
-          printObj.FontBold = !positiontotal = 1
+          printObj.FontBold = !positionTotal = 1
           printObj.FontItalic = nz(!pointsGrandTotal, 0) = lastPos
           prStr = Left(!nickName, 12)
           If alfabet Then
-            prStr = prStr & " (" & !positiontotal & ")"
+            prStr = prStr & " (" & !positionTotal & ")"
           End If
           If !pointsGrandTotal = lastPos Then
             printObj.ForeColor = vbRed
-          ElseIf nz(!positiontotal, 0) = 1 Then
+          ElseIf nz(!positionTotal, 0) = 1 Then
             printObj.ForeColor = vbBlue
           ElseIf nz(!positionDay, 0) = 1 Then
             printObj.ForeColor = &H8000&
@@ -6182,12 +6182,12 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
           printObj.Print Format(pts, "##0");
           printObj.ForeColor = 0
           printObj.FontUnderline = False
-          printObj.FontBold = !positiontotal = 1
+          printObj.FontBold = !positionTotal = 1
           printObj.FontItalic = nz(!pointsGrandTotal, 0) = lastPos
           pts = nz(!pointsGrandTotal, 0)
           If !pointsGrandTotal = lastPos Then
               printObj.ForeColor = vbRed
-          ElseIf !positiontotal = 1 Then
+          ElseIf !positionTotal = 1 Then
               printObj.ForeColor = vbBlue
           Else
               printObj.ForeColor = 0
@@ -6195,7 +6195,7 @@ Sub poolstandingsTable(alfabet As Boolean, colpos() As Variant, poolTopPos As In
           printObj.CurrentX = colpos(3) + col + printObj.TextWidth("999") - printObj.TextWidth(CStr(pts))
           If !pointsGrandTotal = lastPos Then
               printObj.ForeColor = &H80&
-          ElseIf !positiontotal = 1 Then
+          ElseIf !positionTotal = 1 Then
               printObj.ForeColor = &HC00000
           Else
               printObj.ForeColor = 0
@@ -6617,7 +6617,7 @@ Dim infostr As String
       Loop
       If Not .RecordCount = 0 Then
         .MoveLast
-        If !positiontotal = 1 Then
+        If !positionTotal = 1 Then
             printObj.ForeColor = &HC00000
             printObj.FontBold = True
         Else
@@ -6659,8 +6659,8 @@ Dim infostr As String
         printObj.CurrentX = posX(UBound(posX) - 3) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsGrandTotal, 0), pntFormat))) / 2
         printObj.Print Format(nz(!pointsGrandTotal, 0), pntFormat);
         ttlColWidth = posX(UBound(posX) - 1) - posX(UBound(posX) - 2)
-        printObj.CurrentX = posX(UBound(posX) - 2) + (ttlColWidth - printObj.TextWidth(Format(nz(!positiontotal, 0), pntFormat))) / 2
-        printObj.Print Format(nz(!positiontotal, 0), pntFormat);
+        printObj.CurrentX = posX(UBound(posX) - 2) + (ttlColWidth - printObj.TextWidth(Format(nz(!positionTotal, 0), pntFormat))) / 2
+        printObj.Print Format(nz(!positionTotal, 0), pntFormat);
         printObj.CurrentX = printObj.ScaleWidth - 50 - printObj.TextWidth(Format(nz(!moneyTotal, 0), "currency"))
         printObj.ForeColor = vbBlack
         printObj.FontItalic = False
