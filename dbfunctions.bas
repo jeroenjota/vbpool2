@@ -1957,7 +1957,7 @@ Dim i As Integer
     End If
 '   3rd and 4th places for  later date
     If pl > 2 Then
-      i = i + 1
+      i = 3
       If !predictionteam3 = winner Then
         deelnpnt(0) = deelnpnt(0) + pnt
         deelnpnt(i) = pnt

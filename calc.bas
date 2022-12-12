@@ -249,6 +249,18 @@ Dim winners() As Long
     Next
     ttlPts = pts(0)
   End If
+  'If thisForm = 81 Then Stop
+  sqlstr = "UPDATE tblCompetitorPoints SET "
+  sqlstr = sqlstr & " pointsFinalStanding = " & ttlPts
+  sqlstr = sqlstr & ", pointsGroupStanding = " & getPoolFormPoints(thisForm, matchOrder - 1, 7, cn)
+  sqlstr = sqlstr & ", pointsFinals_8 = " & getPoolFormPoints(thisForm, matchOrder - 1, 16, cn)
+  sqlstr = sqlstr & ", pointsFinals_4 = " & getPoolFormPoints(thisForm, matchOrder - 1, 25, cn)
+  sqlstr = sqlstr & ", pointsFinals_2 = " & getPoolFormPoints(thisForm, matchOrder - 1, 30, cn)
+  sqlstr = sqlstr & ", pointsFinal = " & getPoolFormPoints(thisForm, matchOrder - 1, 36, cn) ' + ttlPts
+  sqlstr = sqlstr & " WHERE competitorPoolID = " & thisForm
+  sqlstr = sqlstr & " AND matchOrder = " & matchOrder
+  cn.Execute sqlstr
+
   getTournamentStandingPoints = ttlPts
   rs.Close
 End Function
@@ -266,6 +278,7 @@ Dim rsTS As ADODB.Recordset
 Set rsTS = New ADODB.Recordset
 Dim realCnt As Integer
 Dim i As Integer
+
   ttlPts = getTournamentStandingPoints(thisForm, matchOrder, cn)
   'get the topscorer(s) points
   sqlstr = "Select * from tblPredictionTopScorers WHERE competitorPoolID = " & thisForm
@@ -293,7 +306,7 @@ Dim i As Integer
   If rs!topScorergoals = realCnt Then
     ptsTs = ptsTs + getPointsForID(24, cn)
   End If
-  ttlPts = ttlPts + ptsTs
+  'ttlPts = ttlPts + ptsTs
   rs.Close
   Set rs = Nothing
 'get the statistics points
@@ -303,7 +316,7 @@ Dim i As Integer
     ptsStats(0) = ptsStats(0) + ptsStats(i - dpAant + 1)
     '(that was quick ;-)
   Next
-  ttlPts = ttlPts + ptsStats(0)
+  'ttlPts = ttlPts + ptsStats(0)
     
 'now insert the points into the competitorPoints table
 'If thisForm = 23 Then Stop
@@ -320,7 +333,7 @@ Dim i As Integer
   sqlstr = sqlstr & " AND matchOrder = " & matchOrder
   cn.Execute sqlstr
   'return the total
-  getEndWinnerPoints = ttlPts
+  getEndWinnerPoints = ttlPts + ptsTs + ptsStats(0)
 End Function
 
 Function getfinalistPoints(thisForm As Long, matchOrder As Integer, small As Boolean, cn As ADODB.Connection)
@@ -1092,7 +1105,7 @@ Dim rs As ADODB.Recordset
   Set rs = New ADODB.Recordset
   prizes(0) = getPrizeMoney(0, cn)
   sqlstr = "Select * from tblCompetitorPoints "
-  sqlstr = sqlstr & " WHERE matchNumber = " & getMatchCount(0, cn)
+  sqlstr = sqlstr & " WHERE matchorder = " & getMatchCount(0, cn)
   sqlstr = sqlstr & " AND competitorPoolID IN ("
   sqlstr = sqlstr & " SELECT competitorPoolID from tblCompetitorPools WHERE poolID = " & thisPool
   sqlstr = sqlstr & ")"

@@ -6389,6 +6389,7 @@ Dim fin8ttl As Integer
 Dim fin4ttl As Integer
 Dim fin2ttl As Integer
 Dim fin34ttl As Integer
+Dim finalsPnts As Integer
 Dim matchNr As Integer
 Dim txtStr As String
 Dim verttxtHeight 'de hoogte van de verticale text bovenin
@@ -6430,7 +6431,7 @@ Dim infostr As String
   fontSizing 10
   ReDim posX(1)
   posX(1) = printObj.CurrentX
-  colWidthFactor = 0.92 * 64 / getMatchCount(0, cn)
+  colWidthFactor = 0.96 * 64 / getMatchCount(0, cn)
   With rsWeds
     If .RecordCount > 0 Then
       .MoveFirst
@@ -6448,6 +6449,10 @@ Dim infostr As String
         rotater.Angle = 0
         fontSizing 10
         xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+        'make last two columns wider (more points)
+        If UBound(posX) > 63 Then
+          xPos = printObj.CurrentX + printObj.TextWidth("999") * colWidthFactor
+        End If
         ReDim Preserve posX(UBound(posX) + 1)
         posX(UBound(posX)) = xPos
         rsWeds.MoveNext
@@ -6456,55 +6461,55 @@ Dim infostr As String
     End If
   End With
   rotater.Angle = 90
-  printObj.CurrentX = posX(UBound(posX))
-  headCnt = headCnt + 1
-  ReDim Preserve headTxt(headCnt)
-  headTxt(headCnt) = " groepstanden"
-  rotater.PrintText headTxt(headCnt)
+'  printObj.CurrentX = posX(UBound(posX))
+'  headCnt = headCnt + 1
+'  ReDim Preserve headTxt(headCnt)
+'  headTxt(headCnt) = " groepstanden"
+'  rotater.PrintText headTxt(headCnt)
   
-  If getTournamentInfo("tournamentgroupCount", cn) > 4 Then
-    xPos = printObj.CurrentX + printObj.TextWidth("199") * colWidthFactor
-    ReDim Preserve posX(UBound(posX) + 1)
-    posX(UBound(posX)) = xPos
-    rotater.Angle = 90
-    printObj.CurrentX = posX(UBound(posX))
-    headCnt = headCnt + 1
-    ReDim Preserve headTxt(headCnt)
-    headTxt(headCnt) = " 8e Finales"
-    rotater.PrintText headTxt(headCnt)
-  End If
-  xPos = printObj.CurrentX + printObj.TextWidth("199") * colWidthFactor
-  ReDim Preserve posX(UBound(posX) + 1)
-  posX(UBound(posX)) = xPos
-  rotater.Angle = 90
-  printObj.CurrentX = posX(UBound(posX))
+'  If getTournamentInfo("tournamentgroupCount", cn) > 4 Then
+'    xPos = printObj.CurrentX + printObj.TextWidth("199") * colWidthFactor
+'    ReDim Preserve posX(UBound(posX) + 1)
+'    posX(UBound(posX)) = xPos
+'    rotater.Angle = 90
+'    printObj.CurrentX = posX(UBound(posX))
+'    headCnt = headCnt + 1
+'    ReDim Preserve headTxt(headCnt)
+'    headTxt(headCnt) = " 8e Finales"
+'    rotater.PrintText headTxt(headCnt)
+'  End If
+'  xPos = printObj.CurrentX + printObj.TextWidth("199") * colWidthFactor
+'  ReDim Preserve posX(UBound(posX) + 1)
+'  posX(UBound(posX)) = xPos
+'  rotater.Angle = 90
+'  printObj.CurrentX = posX(UBound(posX))
+'
+'  headCnt = headCnt + 1
+'  ReDim Preserve headTxt(headCnt)
+'  headTxt(headCnt) = " Kw Finales"
+'  rotater.PrintText headTxt(headCnt)
+'
+'  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+'  ReDim Preserve posX(UBound(posX) + 1)
+'  posX(UBound(posX)) = xPos
+'  rotater.Angle = 90
+'  printObj.CurrentX = posX(UBound(posX))
+'  headCnt = headCnt + 1
+'  ReDim Preserve headTxt(headCnt)
+'  headTxt(headCnt) = " Hv Finales"
+'  rotater.PrintText headTxt(headCnt)
+'
+'  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+'  ReDim Preserve posX(UBound(posX) + 1)
+'  posX(UBound(posX)) = xPos
+'  rotater.Angle = 90
+'  printObj.CurrentX = posX(UBound(posX))
+'  headCnt = headCnt + 1
+'  ReDim Preserve headTxt(headCnt)
+'  headTxt(headCnt) = " Finales"
+'  rotater.PrintText headTxt(headCnt)
   
-  headCnt = headCnt + 1
-  ReDim Preserve headTxt(headCnt)
-  headTxt(headCnt) = " Kw Finales"
-  rotater.PrintText headTxt(headCnt)
-  
-  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
-  ReDim Preserve posX(UBound(posX) + 1)
-  posX(UBound(posX)) = xPos
-  rotater.Angle = 90
-  printObj.CurrentX = posX(UBound(posX))
-  headCnt = headCnt + 1
-  ReDim Preserve headTxt(headCnt)
-  headTxt(headCnt) = " Hv Finales"
-  rotater.PrintText headTxt(headCnt)
-  
-  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
-  ReDim Preserve posX(UBound(posX) + 1)
-  posX(UBound(posX)) = xPos
-  rotater.Angle = 90
-  printObj.CurrentX = posX(UBound(posX))
-  headCnt = headCnt + 1
-  ReDim Preserve headTxt(headCnt)
-  headTxt(headCnt) = " Finales"
-  rotater.PrintText headTxt(headCnt)
-  
-  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+  xPos = printObj.CurrentX + printObj.TextWidth("999") * colWidthFactor
   ReDim Preserve posX(UBound(posX) + 1)
   posX(UBound(posX)) = xPos
   rotater.Angle = 90
@@ -6514,7 +6519,7 @@ Dim infostr As String
   headTxt(headCnt) = " Eindstand"
   rotater.PrintText headTxt(headCnt)
   
-  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+  xPos = printObj.CurrentX + printObj.TextWidth("999") * colWidthFactor
   ReDim Preserve posX(UBound(posX) + 1)
   posX(UBound(posX)) = xPos
   rotater.Angle = 90
@@ -6602,7 +6607,7 @@ Dim infostr As String
       fontSizing 8
       Do While Not .EOF
         i = i + 1
-        printObj.CurrentX = posX(i) + (colWidth - printObj.TextWidth(Format(nz(!pointsDay, 0), pntFormat))) / 2
+        printObj.CurrentX = posX(i) + (posX(i + 1) - posX(i) - printObj.TextWidth(Format(nz(!pointsDay, 0), pntFormat))) / 2
         printObj.FontItalic = nz(!ptsToto, 0) <> 0
         printObj.FontBold = nz(!ptsFt, 0) <> 0
         printObj.FontUnderline = nz(!ptsHt, 0) > 0
@@ -6633,27 +6638,33 @@ Dim infostr As String
         fin8ttl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsFinals_8", cn)
         fin4ttl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsFinals_4", cn)
         fin2ttl = getTotalPointsForFieldUntilMatch(rs!competitorPoolID, toMatch, "pointsFinals_2", cn)
-        printObj.CurrentX = posX(UBound(posX) - 11) + (ttlColWidth - printObj.TextWidth(Format(grpTtl, pntFormat))) / 2
-        printObj.Print Format(grpTtl, pntFormat);
-        ttlColWidth = posX(UBound(posX) - 9) - posX(UBound(posX) - 10)
-        If getTournamentInfo("tournamentGroupCount", cn) > 4 Then
-            printObj.CurrentX = posX(UBound(posX) - 10) + (ttlColWidth - printObj.TextWidth(Format(fin8ttl, pntFormat))) / 2
-            printObj.Print Format(fin8ttl, pntFormat);
-            ttlColWidth = posX(UBound(posX) - 8) - posX(UBound(posX) - 9)
-        End If
-        printObj.CurrentX = posX(UBound(posX) - 9) + (ttlColWidth - printObj.TextWidth(Format(fin4ttl, pntFormat))) / 2
-        printObj.Print Format(fin4ttl, pntFormat);
-        ttlColWidth = posX(UBound(posX) - 7) - posX(UBound(posX) - 8)
-        printObj.CurrentX = posX(UBound(posX) - 8) + (ttlColWidth - printObj.TextWidth(Format(fin2ttl, pntFormat))) / 2
-        printObj.Print Format(fin2ttl, pntFormat);
-        ttlColWidth = posX(UBound(posX) - 6) - posX(UBound(posX) - 7)
-        printObj.CurrentX = posX(UBound(posX) - 7) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsFinal, 0) + nz(!pointsFinals_34, 0), pntFormat))) / 2
-        printObj.Print Format(nz(!pointsFinal, 0) + nz(!pointsFinals_34, 0), pntFormat);
+        finalsPnts = fin8ttl + fin4ttl + fin2ttl + fin34ttl + !pointsFinal
+'        printObj.CurrentX = posX(UBound(posX) - 8) + (ttlColWidth - printObj.TextWidth(Format(grpTtl, pntFormat))) / 2
+'        printObj.Print Format(grpTtl, pntFormat);
+'        ttlColWidth = posX(UBound(posX) - 9) - posX(UBound(posX) - 10)
+'        If getTournamentInfo("tournamentGroupCount", cn) > 4 Then
+'            printObj.CurrentX = posX(UBound(posX) - 10) + (ttlColWidth - printObj.TextWidth(Format(fin8ttl, pntFormat))) / 2
+'            printObj.Print Format(fin8ttl, pntFormat);
+'            ttlColWidth = posX(UBound(posX) - 8) - posX(UBound(posX) - 9)
+'        End If
+'        printObj.CurrentX = posX(UBound(posX) - 9) + (ttlColWidth - printObj.TextWidth(Format(fin4ttl, pntFormat))) / 2
+'        printObj.Print Format(fin4ttl, pntFormat);
+'        ttlColWidth = posX(UBound(posX) - 7) - posX(UBound(posX) - 8)
+'        printObj.CurrentX = posX(UBound(posX) - 8) + (ttlColWidth - printObj.TextWidth(Format(fin2ttl, pntFormat))) / 2
+'        printObj.Print Format(fin2ttl, pntFormat);
+'        ttlColWidth = posX(UBound(posX) - 6) - posX(UBound(posX) - 7)
+'        printObj.CurrentX = posX(UBound(posX) - 7) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsFinal, 0) + nz(!pointsFinals_34, 0), pntFormat))) / 2
+'        printObj.Print Format(nz(!pointsFinal, 0) + nz(!pointsFinals_34, 0), pntFormat);
+'        ttlColWidth = posX(UBound(posX) - 6) - posX(UBound(posX) - 7)
+'        printObj.CurrentX = posX(UBound(posX) - 7) + (ttlColWidth - printObj.TextWidth(Format(finalsPnts, pntFormat))) / 2
+'        printObj.Print Format(finalsPnts, pntFormat);
+'
+        'If rs!nickName = "Caveman" Then Stop
         ttlColWidth = posX(UBound(posX) - 5) - posX(UBound(posX) - 6)
         printObj.CurrentX = posX(UBound(posX) - 6) + (ttlColWidth - printObj.TextWidth(Format(!pointsFinalStanding, pntFormat))) / 2
         printObj.Print Format(!pointsFinalStanding, pntFormat);
         ttlColWidth = posX(UBound(posX) - 4) - posX(UBound(posX) - 5)
-        printObj.CurrentX = posX(UBound(posX) - 5) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsTopscorers, 0) + nz(!pointsOther, 0), pntFormat))) / 2
+        printObj.CurrentX = posX(UBound(posX) - 5) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsTopscorers, 0), pntFormat))) / 2
         printObj.Print Format(nz(!pointsTopscorers, 0), pntFormat);
         ttlColWidth = posX(UBound(posX) - 3) - posX(UBound(posX) - 4)
         printObj.CurrentX = posX(UBound(posX) - 4) + (ttlColWidth - printObj.TextWidth(Format(nz(!pointsOther, 0) + nz(!pointsTopscorers, 0), pntFormat))) / 2
