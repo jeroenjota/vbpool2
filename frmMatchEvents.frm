@@ -463,10 +463,11 @@ Dim thisTeam As Long
       
     Else
       'set teams in next round
+      winner = getMatchresult(thisMatch, 6, cn)
+      teams = getMatchTeamIDs(thisMatch, cn)
       'if there is a third place AND this is a semi final set the loser
       If getTournamentInfo("tournamentThirdPlace", cn) And getMatchInfo(thisMatch, "matchtype", cn) = 3 Then  'halve finale verliezers bepalen voor derde plaats (als aanwezig)
-        winner = getMatchresult(thisMatch, 6, cn)
-        teams = getMatchTeamIDs(thisMatch, cn)
+        'thisTeam is een van de teams in de kleine finale
         If teams(0) = winner Then
           thisTeam = teams(1)
         Else
@@ -478,7 +479,6 @@ Dim thisTeam As Long
         cn.Execute sqlstr
       End If
       'set the winners through to the next round
-      winner = nz(getMatchresult(thisMatch, 6, cn), 0)
       sqlstr = "UPDATE tblTournamentTeamCodes SET teamID = " & winner
       sqlstr = sqlstr & " WHERE tournamentID = " & thisTournament
       sqlstr = sqlstr & " AND teamCode = 'W" & Format(getMatchNumber(thisMatch, cn), "0") & "'"
@@ -488,8 +488,9 @@ Dim thisTeam As Long
     Me.Visible = False
     showInfo True, "Ogenblikje ..."
     write2Log "Wedstrijd ogeslagen " & getMatchDescription(thisMatch, cn, , , True), True
-    
+    'bereken de punten voor de deelnemers
     updatePoolFormPoints thisMatch, cn
+    'en zet de posities in de stand
     updatePoolPositions thisMatch, cn
     showInfo False
   End If

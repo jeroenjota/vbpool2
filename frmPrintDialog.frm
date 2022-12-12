@@ -5616,12 +5616,20 @@ Dim final8Pts(8) As Integer
         End If
 '        If !competitorPoolID = 46 Then Stop
        prntPts = getPoolFormPoints(!competitorPoolID, toMatch, 37, cn)
-       printObj.CurrentX = (pntPos(finBegin) + pntPos(EindstBegin) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
+       printObj.CurrentX = (pntPos(33) + pntPos(EindstBegin) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
        printObj.FontBold = True
        printObj.Print Format(prntPts, pntFormat);
        printObj.FontBold = False
 
        pntFormat = "0;;\ ;-"
+       If getLastMatchPlayed(cn) >= getMatchCount(0, cn) - 1 Then pntFormat = "0"
+       If getTournamentInfo("tournamentThirdplace", cn) And toMatch = getMatchCount(0, cn) - 1 Then
+        For i = 3 To 4
+            prntPts = getPoolFormEndPoints(!competitorPoolID, i, cn)
+            printObj.CurrentX = (pntPos(EindstBegin - 1 + i) + pntPos(EindstBegin + i) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
+            printObj.Print Format(prntPts, pntFormat);
+        Next
+      End If
        If getLastMatchPlayed(cn) = getMatchCount(0, cn) Then
         pntFormat = "0"  'eindstand
          For i = 1 To 2
@@ -5630,14 +5638,6 @@ Dim final8Pts(8) As Integer
              printObj.Print Format(prntPts, pntFormat);
          Next
          pntFormat = "0;;\ ;-"
-         If getLastMatchPlayed(cn) >= getMatchCount(0, cn) - 1 Then pntFormat = "0"
-         If getTournamentInfo("tournamentThirdplace", cn) Then
-          For i = 3 To 4
-              prntPts = getPoolFormEndPoints(!competitorPoolID, i, cn)
-              printObj.CurrentX = (pntPos(EindstBegin - 1 + i) + pntPos(EindstBegin + i) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
-              printObj.Print Format(prntPts, pntFormat);
-          Next
-        End If
       End If
        pntFormat = "0;;\ ;-"
        If getLastMatchPlayed(cn) = getMatchCount(0, cn) Then

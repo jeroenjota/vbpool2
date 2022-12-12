@@ -1882,7 +1882,7 @@ Function getLastPoolFormPosition(afterMatch As Integer, cn As ADODB.Connection)
   sqlstr = sqlstr & " ORDER BY positionTotal DESC"
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   If Not rs.EOF Then
-    getLastPoolFormPosition = rs!positiontotal
+    getLastPoolFormPosition = rs!positionTotal
   Else
     getLastPoolFormPosition = 0
   End If
@@ -1909,7 +1909,7 @@ Dim i As Integer
   rs.Open sqlstr, cn, adOpenStatic, adLockReadOnly
   
   finMatch = getFinalmatchOrder(4, True, cn)
-  
+  If pl > 2 Then finMatch = finMatch - 1
   If getTournamentInfo("tournamentThirdPlace", cn) Then
     thPlMatch = getFinalmatchOrder(7, True, cn)
     finalPlaces = 4
@@ -1921,8 +1921,16 @@ Dim i As Integer
   
   With rs
     i = 0
-    pnt = getPointsForID(15, cn) 'tournooi winnaar
-    i = i + 1
+    Select Case pl
+    Case 1
+      pnt = getPointsForID(15, cn) 'tournooi winnaar
+    Case 2
+      pnt = getPointsForID(14, cn) '2e
+    Case 3
+      pnt = getPointsForID(13, cn) '3e
+    Case 4
+      pnt = getPointsForID(29, cn) '4e
+    End Select
     If pnt > 0 Then
       If getMatchresult(finMatch, 6, cn) = getMatchresult(finMatch, 13, cn) Then
         winner = getMatchresult(finMatch, 13, cn)
@@ -1931,36 +1939,35 @@ Dim i As Integer
         winner = getMatchresult(finMatch, 14, cn)
         loser = getMatchresult(finMatch, 13, cn)
       End If
+    Else
+      getPoolFormEndPoints = 0
+      Exit Function
+    End If
+    i = i + 1
+    If pl <= 2 Then
       If !predictionteam1 = winner Then
         deelnpnt(0) = deelnpnt(0) + pnt
         deelnpnt(i) = pnt
       End If
-    End If
-    pnt = getPointsForID(14, cn) '2e
-    i = i + 1
-    If pnt > 0 Then
+      i = i + 1
       If !predictionteam2 = loser Then
         deelnpnt(0) = deelnpnt(0) + pnt
         deelnpnt(i) = pnt
       End If
     End If
 '   3rd and 4th places for  later date
-'    i = i + 1
-'    pnt = getPointsForID(13, cn) '3e
-'    If pnt > 0 Then
-'      If !predictionteam3 = getMatchresult(finMatch, 6, cn) Then
-'        deelnpnt(0) = deelnpnt(0) + pnt
-'        deelnpnt(i) = pnt
-'      End If
-'    End If
-'    i = i + 1
-'    pnt = getPointsForID(29, cn) '4e
-'    If pnt > 0 Then
-'      If !predictionteam4 = getMatchresult(finMatch, 6, cn) Then
-'        deelnpnt(0) = deelnpnt(0) + pnt
-'        deelnpnt(i) = pnt
-'      End If
-'    End If
+    If pl > 2 Then
+      i = i + 1
+      If !predictionteam3 = winner Then
+        deelnpnt(0) = deelnpnt(0) + pnt
+        deelnpnt(i) = pnt
+      End If
+      i = i + 1
+      If !predictionteam4 = loser Then
+        deelnpnt(0) = deelnpnt(0) + pnt
+        deelnpnt(i) = pnt
+      End If
+    End If
   End With
   
   rs.Close

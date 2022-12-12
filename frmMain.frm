@@ -558,7 +558,7 @@ If MsgBox(msg, vbYesNo + vbQuestion, "Test uitslagen") = vbYes Then
   If MsgBox(msg, vbYesNo + vbQuestion, "Test data") = vbYes Then
   
     For match = startWed To endWed
-      If match = 34 Then Stop
+      'If match = 34 Then Stop
       updatePoolpointsForMatch match, cn
     Next
     showInfo False

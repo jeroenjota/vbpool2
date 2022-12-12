@@ -133,7 +133,8 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
   Do While Not rs.EOF
     
     thisForm = rs!competitorPoolID
-    'If thisForm = 74 Then Stop
+'    If thisForm = 87 Then Stop
+ '   If thisForm = 100 Then Stop
     poolFormName = rs!nickName & " (" & rs.AbsolutePosition & "/" & rs.RecordCount & ")"
     'show some info
     showInfo True, "Punten tellen", "Na " & matchOrder & "e wedstrijd (nr " & matchNr & "): " & team(0) & " - " & team(1), poolFormName
@@ -143,7 +144,7 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
     sqlstr = sqlstr & " WHERE competitorPoolID = " & thisForm
     sqlstr = sqlstr & " AND matchOrder >= " & matchOrder
     cn.Execute sqlstr
-    'add a record for thisForm and matchNr
+    'add a record for thisForm and matchOrder
     sqlstr = "INSERT INTO tblCompetitorPoints (competitorPoolID, matchOrder)"
     sqlstr = sqlstr & "VALUES (" & thisForm & ", " & matchOrder & ")"
     cn.Execute sqlstr
@@ -180,8 +181,16 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
         dayPoints = dayPoints + points
       End If
       If matchType = 3 Then 'halve finale
-      'check the poolForm finalists
-        points = getfinalistPoints(thisForm, matchOrder, cn)
+      'check the poolForm finalists/3rd place match
+        points = getfinalistPoints(thisForm, matchOrder, True, cn) ' 3rd place match
+        points = points + getfinalistPoints(thisForm, matchOrder, False, cn)
+        dayPoints = dayPoints + points
+      End If
+      If matchType = 7 Then '3rd place
+        
+        'If thisForm = 116 Then Stop
+
+        points = getTournamentStandingPoints(thisForm, matchOrder, cn)
         dayPoints = dayPoints + points
       End If
       If matchType = 4 Then 'THE FINAL ;-)
@@ -191,7 +200,7 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
        dayPoints = dayPoints + points
       End If
     End If
-    
+    'If thisForm = 73 Then Stop
     totalPoints = getTotalDayPoints(thisForm, matchOrder, savdat, cn) + dayPoints
     sqlstr = "UPDATE tblCompetitorPoints set pointsDay = " & dayPoints '+ final8Pts
     sqlstr = sqlstr & ", pointsDayTotal = " & totalPoints
@@ -204,45 +213,61 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
   Loop
 End Sub
 
-Function getEndWinnerPoints(thisForm As Long, matchOrder As Integer, cn As ADODB.Connection)
-'check the end ranking
-''''''''''''''''''''''''
-'NOT YET FIT FOR 3rd place matches
-''''''''''''''''''''''''
+Function getTournamentStandingPoints(thisForm As Long, matchOrder As Integer, cn As ADODB.Connection)
 Dim rs As ADODB.Recordset
 Set rs = New ADODB.Recordset
+Dim i As Integer
+Dim final As Boolean
+Dim place As Integer
+Dim teamPos As Integer
 Dim sqlstr As String
-Dim pts(4) As Integer
-Dim ptsTs As Integer
-Dim ptsStats(5) As Integer
+Dim pts(2) As Integer
 Dim ttlPts As Integer
 Dim winners() As Long
-Dim rsTS As ADODB.Recordset
-Set rsTS = New ADODB.Recordset
-Dim realCnt As Integer
-Dim i As Integer
-  pts(1) = getPointsForID(15, cn) 'first place
-  pts(2) = getPointsForID(14, cn) 'second place
-  If getTournamentInfo("tournamentThirdPlace", cn) Then
-    pts(3) = getPointsForID(13, cn) '3rdplace
-    pts(4) = getPointsForID(29, cn) '4th place
+  final = matchOrder = getFinalmatchOrder(4, True, cn)
+  winners = getWinners(final, cn)
+  If final Then
+    pts(1) = getPointsForID(15, cn) '3rdplace
+    pts(2) = getPointsForID(14, cn) '4th place
+    place = 1
+  Else  '3rd place
+    pts(1) = getPointsForID(13, cn) '3rdplace
+    pts(2) = getPointsForID(29, cn) '4th place
+    place = 3
   End If
-  winners = getWinners(False, cn)
   sqlstr = "Select * from tblCompetitorPools"
   sqlstr = sqlstr & " WHERE competitorPoolID = " & thisForm
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   'get the points for the final standing
-    'pointsFinalStanding
+  teamPos = 0
   If Not rs.EOF Then
-    For i = 1 To 2
-      If rs("predictionTeam" & i) = winners(i) Then
-        pts(0) = pts(0) + pts(i)
+    For i = place To place + 1
+      teamPos = teamPos + 1
+      If rs("predictionTeam" & i) = winners(teamPos) Then
+        pts(0) = pts(0) + pts(teamPos)
       End If
     Next
     ttlPts = pts(0)
   End If
+  getTournamentStandingPoints = ttlPts
   rs.Close
-'get the topscorer(s) points
+End Function
+
+Function getEndWinnerPoints(thisForm As Long, matchOrder As Integer, cn As ADODB.Connection)
+'check the end ranking
+''''''''''''''''''''''''
+Dim rs As ADODB.Recordset
+Set rs = New ADODB.Recordset
+Dim sqlstr As String
+Dim ptsTs As Integer
+Dim ptsStats(5) As Integer
+Dim ttlPts As Integer
+Dim rsTS As ADODB.Recordset
+Set rsTS = New ADODB.Recordset
+Dim realCnt As Integer
+Dim i As Integer
+  ttlPts = getTournamentStandingPoints(thisForm, matchOrder, cn)
+  'get the topscorer(s) points
   sqlstr = "Select * from tblPredictionTopScorers WHERE competitorPoolID = " & thisForm
   sqlstr = sqlstr & " AND topscorerPosition = 1"  'not realy necessary, as long we only have one topscorer
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
@@ -283,7 +308,7 @@ Dim i As Integer
 'now insert the points into the competitorPoints table
 'If thisForm = 23 Then Stop
   sqlstr = "UPDATE tblCompetitorPoints SET "
-  sqlstr = sqlstr & " pointsFinalStanding = " & pts(0)
+  sqlstr = sqlstr & " pointsFinalStanding = " & ttlPts
   sqlstr = sqlstr & ", pointsTopscorers = " & ptsTs
   sqlstr = sqlstr & ", pointsOther = " & ptsStats(0)
   sqlstr = sqlstr & ", pointsGroupStanding = " & getPoolFormPoints(thisForm, matchOrder - 1, 7, cn)
@@ -298,7 +323,7 @@ Dim i As Integer
   getEndWinnerPoints = ttlPts
 End Function
 
-Function getfinalistPoints(thisForm As Long, matchOrder As Integer, cn As ADODB.Connection)
+Function getfinalistPoints(thisForm As Long, matchOrder As Integer, small As Boolean, cn As ADODB.Connection)
 'check the two finalists
 Dim rs As ADODB.Recordset
 Set rs = New ADODB.Recordset
@@ -312,25 +337,38 @@ Dim grp As String
 Dim ttlPts As Integer
 Dim matchNumber As Integer
   matchNumber = getMatchNumber(matchOrder, cn)
-  pts(1) = getPointsForID(11, cn)
-  pts(2) = getPointsForID(12, cn)
-  finMatchNumber = 64
-  leftTeam = matchNumber = 62
+  leftTeam = matchNumber = getFinalmatchOrder(3, True, cn)
   sqlstr = "Select * from tblTournamentTeamCodes "
   sqlstr = sqlstr & " WHERE tournamentID = " & thisTournament
   sqlstr = sqlstr & " AND teamID > 0"
-  sqlstr = sqlstr & " AND teamCode = 'W" & matchNumber & "'"
+  If small Then
+    sqlstr = sqlstr & " AND teamCode = 'V" & matchNumber & "'"
+    pts(1) = getPointsForID(30, cn)
+    pts(2) = getPointsForID(31, cn)
+    finMatchNumber = getFinalmatchOrder(7, True, cn)
+  Else
+    sqlstr = sqlstr & " AND teamCode = 'W" & matchNumber & "'"
+    pts(1) = getPointsForID(11, cn)
+    pts(2) = getPointsForID(12, cn)
+    finMatchNumber = getFinalmatchOrder(4, True, cn)
+  End If
   rsFin.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   If Not rsFin.EOF Then
     sqlstr = "Select * from tblPrediction_Finals"
     sqlstr = sqlstr & " WHERE competitorPoolId = " & thisForm
-    sqlstr = sqlstr & " AND matchOrder between " & getFinalmatchOrder(4, True, cn)
-    sqlstr = sqlstr & " AND " & getFinalmatchOrder(4, False, cn)
+    If small Then
+      sqlstr = sqlstr & " AND matchOrder between " & getFinalmatchOrder(7, True, cn)
+      sqlstr = sqlstr & " AND " & getFinalmatchOrder(7, False, cn)
+    Else
+      sqlstr = sqlstr & " AND matchOrder between " & getFinalmatchOrder(4, True, cn)
+      sqlstr = sqlstr & " AND " & getFinalmatchOrder(4, False, cn)
+    End If
     sqlstr = sqlstr & " AND (teamnameA = " & rsFin!teamID
     sqlstr = sqlstr & " or teamNameB = " & rsFin!teamID & ")"
     rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
     
     Do While Not rs.EOF  'found a record so at least some points
+      'If thisForm = 119 Then Stop
        pts(0) = pts(1)
       'found the team check the place
       If rs!matchOrder = finMatchNumber Then
@@ -346,7 +384,12 @@ Dim matchNumber As Integer
   rsFin.Close
   Set rsFin = Nothing
   Set rs = Nothing
-  sqlstr = "UPDATE tblCompetitorPoints SET pointsTeamsFinal = " & ttlPts
+  If small Then
+    sqlstr = "UPDATE tblCompetitorPoints SET pointsTeamsFinals34 = " & ttlPts
+  Else
+   ' If ttlPts > 0 Then Stop
+    sqlstr = "UPDATE tblCompetitorPoints SET pointsTeamsFinal = " & ttlPts
+  End If
   'copy values from previous match for reposrts later
   sqlstr = sqlstr & ", pointsGroupStanding = " & getPoolFormPoints(thisForm, matchOrder - 1, 7, cn)
   sqlstr = sqlstr & ", pointsFinals_8 = " & getPoolFormPoints(thisForm, matchOrder - 1, 16, cn)
