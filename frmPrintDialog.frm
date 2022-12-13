@@ -4058,22 +4058,21 @@ Dim grpAant As Integer
   printObj.Print "Kwart finales";
   colNr = colNr + 1
   printObj.CurrentX = col(colNr)
-  printObj.Print "Halve finales";
+  printObj.Print "Derde plaats";
   If colNr < 2 Then
     colNr = colNr + 1
     printObj.CurrentX = col(colNr)
     printObj.Print "Finale";
   End If
-  yPos = printObj.CurrentY
   printObj.FontBold = False
   printObj.ForeColor = 1
   fontSizing 8
   matchCol(0) = printObj.TextWidth("00")
-  matchCol(1) = matchCol(0) + printObj.TextWidth("0")
-  matchCol(2) = matchCol(1) + printObj.TextWidth("wo 29 juni ")
-  matchCol(3) = matchCol(2) + printObj.TextWidth(" 20u:")
-  matchCol(4) = matchCol(3) + printObj.TextWidth("MWWl")
-  matchCol(5) = col(1) - printObj.TextWidth("0-0(0-0)nl:0-0,zwi wnsXX")
+  matchCol(1) = matchCol(0) + printObj.TextWidth(";")
+  matchCol(2) = matchCol(1) + printObj.TextWidth("wo 29 juni")
+  matchCol(3) = matchCol(2) + printObj.TextWidth(",20u:")
+  matchCol(4) = matchCol(3) + printObj.TextWidth("MWW")
+  matchCol(5) = col(1) - printObj.TextWidth("0-0(0-0)nl:0-0,zwi wnsXXX")
   printObj.Print
   yPos = printObj.CurrentY
   Do While Not rs.EOF
@@ -4091,6 +4090,8 @@ Dim grpAant As Integer
       Else
           currentCol = 0
       End If
+    Case 3  'halve finale
+      currentCol = 1
     Case 4 'Finale
       currentCol = 2
       If grpAant <= 4 Then
@@ -4121,11 +4122,12 @@ Dim grpAant As Integer
       printObj.Print getMatchResultPartStr(rs!matchOrder, 2, cn)
       If rs!matchOrder = getMatchCount(0, cn) Then
         printObj.CurrentY = printObj.CurrentY + 50
+        On Error Resume Next
         printObj.Line (col(currentCol), printObj.CurrentY)-(printObj.ScaleWidth, printObj.CurrentY)
         printObj.CurrentY = printObj.CurrentY + 50
-        winners = getWinners(False, cn)
+        winners = getWinners(True, cn)
         printObj.CurrentX = col(currentCol) ' + matchCol(5) - printObj.TextWidth("Kampioen " & txtStr)
-        fontSizing 12
+        fontSizing 10
         printObj.ForeColor = vbBlue
         printObj.FontBold = True
         printObj.Print "Eindstand";
@@ -4139,8 +4141,23 @@ Dim grpAant As Integer
         printObj.FontBold = False
         printObj.CurrentX = col(currentCol) + printObj.TextWidth("Eindstand: ")
         txtStr = getTeamInfo(CInt(winners(2)), "TeamName", cn)
-        
-        printObj.Print "2: " & txtStr;
+        On Error GoTo 0
+        printObj.Print "2: " & txtStr
+        If newYpos < printObj.CurrentY Then
+          newYpos = printObj.CurrentY
+        End If
+        If grpAant > 7 Then
+          winners = getWinners(False, cn)
+          printObj.CurrentX = col(currentCol) + printObj.TextWidth("Eindstand: ")
+          txtStr = getTeamInfo(CInt(winners(1)), "TeamName", cn)
+          printObj.Print "3: " & txtStr
+          printObj.CurrentX = col(currentCol) + printObj.TextWidth("Eindstand: ")
+          txtStr = getTeamInfo(CInt(winners(2)), "TeamName", cn)
+          printObj.Print "4: " & txtStr
+          If newYpos < printObj.CurrentY Then
+            newYpos = printObj.CurrentY
+          End If
+        End If
         
         'printObj.Print " kampioen"
 
@@ -4154,19 +4171,31 @@ Dim grpAant As Integer
         If newYpos < printObj.CurrentY Then
           newYpos = printObj.CurrentY
         End If
-        If rs!matchType <> 7 And rs!matchType <> 4 Then '7 = kleine/ 4 = grote finale
+        If rs!matchType = 2 Then
           printObj.CurrentY = yPos
-        Else
+        End If
+        If rs!matchType = 3 And mType = 2 Then
+          
+          fontSizing 10
+          printObj.ForeColor = vbBlue
+          printObj.CurrentX = col(1)
           printObj.FontBold = True
-          fontSizing 12
+          printObj.Print "Halve finales"
+          printObj.FontBold = False
+          printObj.ForeColor = 1
+          fontSizing 8
+        End If
+        If rs!matchType = 7 Then '7  kleine finale
+          printObj.CurrentY = yPos
+          printObj.CurrentX = col(2)
+        End If
+        If rs!matchType = 4 Then 'grote finale
+          printObj.FontBold = True
+          fontSizing 10
           printObj.ForeColor = vbBlue
           printObj.CurrentX = col(2)
-          If rs!matchType = 7 Then
-            printObj.Print "Derde plaats"
-          ElseIf grpAant > 4 Then
-            printObj.CurrentX = col(2)
-            printObj.Print "Finale"
-          End If
+          printObj.CurrentX = col(2)
+          printObj.Print "Finale"
           printObj.FontBold = False
           printObj.ForeColor = 1
           fontSizing 8
@@ -4178,7 +4207,7 @@ Dim grpAant As Integer
   On Error Resume Next
   printObj.Line (col(0) - 20, topYpos)-(col(1) - 50, newYpos), lineColor, B
   printObj.Line (col(1) - 20, topYpos)-(col(2) - 50, newYpos), lineColor, B
-  printObj.Line (col(2) - 20, topYpos)-(col(3) - 50, newYpos), lineColor, B
+  printObj.Line (col(2) - 20, topYpos)-(col(3) - 20, newYpos), lineColor, B
   On Error GoTo 0
   printObj.CurrentY = newYpos
   printObj.Print
@@ -5267,7 +5296,7 @@ Dim final8Pts(8) As Integer
     ReDim Preserve pntPos(UBound(pntPos) + 1)
     pntPos(UBound(pntPos)) = printObj.CurrentX
     printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
-    printObj.Print "total";
+    printObj.Print "totaal";
     ReDim Preserve pntPos(UBound(pntPos) + 1)
     pntPos(UBound(pntPos)) = printObj.CurrentX
     'groepstanden
@@ -5352,26 +5381,26 @@ Dim final8Pts(8) As Integer
         pntPos(UBound(pntPos)) = printObj.CurrentX
         printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
     End If
-    EindstBegin = UBound(pntPos)
+    EindstBegin = UBound(pntPos) 'pntpos 34
     ' Format(getPointsForThis(15), pntFormat); "/"; Format(getPointsForThis(14), pntFormat); "/"; Format(getPointsForThis(13), pntFormat); "/"; Format(getPointsForThis(29), pntFormat); ")";
     printObj.Print " 1 ";
     ReDim Preserve pntPos(UBound(pntPos) + 1)
     pntPos(UBound(pntPos)) = printObj.CurrentX
-    printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
+    printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth 'pntpos 35
     printObj.Print " 2 ";
     ReDim Preserve pntPos(UBound(pntPos) + 1)
     pntPos(UBound(pntPos)) = printObj.CurrentX
     If thirdPlace Then
-        printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
+        printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth 'pntpos 36
         printObj.Print " 3 ";
         ReDim Preserve pntPos(UBound(pntPos) + 1)
         pntPos(UBound(pntPos)) = printObj.CurrentX
-        printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
+        printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth 'pntpos 37
         printObj.Print " 4 ";
         ReDim Preserve pntPos(UBound(pntPos) + 1)
-        pntPos(UBound(pntPos)) = printObj.CurrentX
+        pntPos(UBound(pntPos)) = printObj.CurrentX 'pntpos 38
     End If
-    AantBegin = UBound(pntPos)
+    AantBegin = UBound(pntPos)  'pntpos 38
     printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
     printObj.Print "dp";
     ReDim Preserve pntPos(UBound(pntPos) + 1)
@@ -5406,15 +5435,15 @@ Dim final8Pts(8) As Integer
     ReDim Preserve pntPos(UBound(pntPos) + 1)
     pntPos(UBound(pntPos)) = printObj.CurrentX
     PosBegin = UBound(pntPos)
-    printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth + printObj.TextWidth("123")
+    printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth + printObj.TextWidth("99")
     ReDim Preserve pntPos(UBound(pntPos) + 1)
     pntPos(UBound(pntPos)) = printObj.CurrentX
     GeldBegin = UBound(pntPos)
     printObj.CurrentX = pntPos(UBound(pntPos)) + colWidth
     printObj.Print "";
-    'laatste kolom
+    'laatste kolom  'pntpos 48
     ReDim Preserve pntPos(UBound(pntPos) + 1)
-    pntPos(UBound(pntPos)) = printObj.ScaleWidth - 50
+    pntPos(UBound(pntPos)) = printObj.ScaleWidth - 20  'pntpos 49
 'Now we print the first line
     printObj.CurrentY = topYpos
     fontSizing 10
@@ -5456,8 +5485,8 @@ Dim final8Pts(8) As Integer
     printObj.Print "";
     printObj.CurrentX = (pntPos(TTLBegin) + pntPos(PosBegin) + colWidth - printObj.TextWidth("Ttl")) / 2
     printObj.Print "Ttl";
-    printObj.CurrentX = (pntPos(PosBegin) + pntPos(GeldBegin) + colWidth - printObj.TextWidth("Pos")) / 2
-    printObj.Print "Pos";
+    printObj.CurrentX = (pntPos(PosBegin) + pntPos(GeldBegin) + colWidth - printObj.TextWidth("pl")) / 2
+    printObj.Print "pl";
     printObj.CurrentX = (pntPos(GeldBegin) + pntPos(GeldBegin + 1) + colWidth - printObj.TextWidth("Geld")) / 2
     printObj.Print "Geld";
     fontSizing 8
@@ -5609,7 +5638,7 @@ Dim final8Pts(8) As Integer
         Else
           pntFormat = "0;;\ ;-"
         End If
-        If thirdPlace Then
+        If thirdPlace Then  'kl finale punten
           prntPts = getPoolFormPoints(!competitorPoolID, toMatch, 34, cn)
           printObj.CurrentX = pntPos(32) + (pntPos(33) - pntPos(32) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
           printObj.Print Format(prntPts, pntFormat);
@@ -5623,24 +5652,24 @@ Dim final8Pts(8) As Integer
 
        pntFormat = "0;;\ ;-"
        If getLastMatchPlayed(cn) >= getMatchCount(0, cn) - 1 Then pntFormat = "0"
-       If getTournamentInfo("tournamentThirdplace", cn) And toMatch = getMatchCount(0, cn) - 1 Then
+       If getTournamentInfo("tournamentThirdplace", cn) And toMatch >= getMatchCount(0, cn) - 1 Then
         For i = 3 To 4
             prntPts = getPoolFormEndPoints(!competitorPoolID, i, cn)
             printObj.CurrentX = (pntPos(EindstBegin - 1 + i) + pntPos(EindstBegin + i) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
             printObj.Print Format(prntPts, pntFormat);
         Next
       End If
-       If getLastMatchPlayed(cn) = getMatchCount(0, cn) Then
+      If getLastMatchPlayed(cn) = getMatchCount(0, cn) Then
         pntFormat = "0"  'eindstand
          For i = 1 To 2
              prntPts = getPoolFormEndPoints(!competitorPoolID, i, cn)
-             printObj.CurrentX = (pntPos(finBegin + i) + pntPos(EindstBegin + i) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
+             printObj.CurrentX = (pntPos(EindstBegin + i - 1) + pntPos(EindstBegin + i) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
              printObj.Print Format(prntPts, pntFormat);
          Next
          pntFormat = "0;;\ ;-"
       End If
-       pntFormat = "0;;\ ;-"
-       If getLastMatchPlayed(cn) = getMatchCount(0, cn) Then
+      pntFormat = "0;;\ ;-"
+      If getLastMatchPlayed(cn) = getMatchCount(0, cn) Then
         'statistics
            pntFormat = "0"
            For i = dpAant To pensAant
@@ -5648,6 +5677,11 @@ Dim final8Pts(8) As Integer
              printObj.CurrentX = (pntPos(AantBegin + i - dpAant) + pntPos(AantBegin + i - dpAant + 1) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
              printObj.Print Format(prntPts, pntFormat);
            Next
+           'eigen doelpunten
+           prntPts = getStatsPointsFor(32, !competitorPoolID, cn)
+           printObj.CurrentX = (pntPos(AantBegin + i - dpAant) + pntPos(AantBegin + i - dpAant + 1) + colWidth - printObj.TextWidth(Format(prntPts, pntFormat))) / 2
+           printObj.Print Format(prntPts, pntFormat);
+           
          'topscorer
           'pointsTopscorers
           prntPts = getPoolFormPoints(!competitorPoolID, toMatch, 39, cn)
@@ -5682,7 +5716,7 @@ Dim final8Pts(8) As Integer
        Else
          geld = getTotalMoney(!competitorPoolID, getMatchPrevDay(toMatch, cn)) 'lastPos money total'getPoolFormPoints(!competitorPoolID, tomatch, 50, cn)
        End If
-       printObj.CurrentX = pntPos(GeldBegin + 1) - colWidth - printObj.TextWidth(Format(geld, "currency"))
+       printObj.CurrentX = pntPos(GeldBegin + 1) - colWidth / 2 - printObj.TextWidth(Format(geld, "currency"))
        printObj.Print Format(geld, "currency");
        printObj.Print
        printObj.ForeColor = 1
@@ -6543,13 +6577,13 @@ Dim infostr As String
   ReDim Preserve posX(UBound(posX) + 1)
   posX(UBound(posX)) = xPos
   rotater.Angle = 90
-  printObj.CurrentX = posX(UBound(posX))
+  printObj.CurrentX = posX(UBound(posX)) + printObj.TextHeight("W") / 2
   headCnt = headCnt + 1
   ReDim Preserve headTxt(headCnt)
   headTxt(headCnt) = " Totaal"
   rotater.PrintText headTxt(headCnt)
   
-  xPos = printObj.CurrentX + printObj.TextWidth("999") * colWidthFactor
+  xPos = posX(UBound(posX)) + printObj.TextWidth("1111") * colWidthFactor
   ReDim Preserve posX(UBound(posX) + 1)
   posX(UBound(posX)) = xPos
   rotater.Angle = 90
@@ -6559,7 +6593,7 @@ Dim infostr As String
   headTxt(headCnt) = " Positie"
   rotater.PrintText headTxt(headCnt)
   
-  xPos = printObj.CurrentX + printObj.TextWidth("99") * colWidthFactor
+  xPos = printObj.CurrentX + printObj.TextWidth("111") * colWidthFactor
   ReDim Preserve posX(UBound(posX) + 1)
   posX(UBound(posX)) = xPos
   rotater.Angle = 90
@@ -6738,12 +6772,13 @@ Dim infostr As String
       End With
       rotater.Angle = 90
       If getTournamentInfo("tournamentgroupcount", cn) > 4 Then
-          X = 11
+          X = 6
       Else
-          X = 10
+          X = 5
       End If
       For i = 0 To UBound(headTxt) - 2
         printObj.CurrentX = posX(UBound(posX) - (X - i))
+        If headTxt(i + 1) = " Totaal" Then printObj.CurrentX = printObj.CurrentX + printObj.TextHeight("W") / 2
         rotater.PrintText headTxt(i + 1)
       Next
       printObj.CurrentX = printObj.ScaleWidth - 100 - printObj.TextWidth("geld")

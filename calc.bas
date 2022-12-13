@@ -78,7 +78,6 @@ Function add3rdPlacePoints(thisPoolForm As Long, matchOrder As Integer, cn As AD
       .MoveNext
     Loop
     If pts(0) > 0 Then
-      'If thisPoolForm = 7 Then Stop
       sqlstr = "UPDATE tblCompetitorPoints SET "
       sqlstr = sqlstr & " pointsTeamsFinals8" & grp & " = [pointsTeamsFinals8" & grp & "] + " & pts(0)
       sqlstr = sqlstr & ", pointsFinals_8 = [pointsFinals_8] + " & pts(0)
@@ -133,8 +132,6 @@ Sub updatePoolFormPoints(matchOrder As Integer, cn As ADODB.Connection)
   Do While Not rs.EOF
     
     thisForm = rs!competitorPoolID
-'    If thisForm = 87 Then Stop
- '   If thisForm = 100 Then Stop
     poolFormName = rs!nickName & " (" & rs.AbsolutePosition & "/" & rs.RecordCount & ")"
     'show some info
     showInfo True, "Punten tellen", "Na " & matchOrder & "e wedstrijd (nr " & matchNr & "): " & team(0) & " - " & team(1), poolFormName
@@ -289,7 +286,7 @@ Dim i As Integer
   sqlstr = sqlstr & " From tblMatchEvents"
   sqlstr = sqlstr & " Where eventid <= 2"
   sqlstr = sqlstr & " GROUP BY tournamentId,playerId"
-  sqlstr = sqlstr & " Having tournamentId = 16"
+  sqlstr = sqlstr & " Having tournamentId = " & thisTournament
   sqlstr = sqlstr & " ORDER BY Count(playerId) DESC;"
   rsTS.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   'loop through possibly more than one topscorer
