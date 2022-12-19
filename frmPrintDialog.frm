@@ -30,6 +30,23 @@ Begin VB.Form frmPrintDialog
    ScaleHeight     =   7995
    ScaleWidth      =   10485
    ShowInTaskbar   =   0   'False
+   Begin VB.Frame frmTS 
+      Height          =   855
+      Left            =   3120
+      TabIndex        =   49
+      Top             =   1560
+      Width           =   3495
+      Begin VB.CheckBox chkTopTS 
+         Alignment       =   1  'Right Justify
+         Caption         =   "Alleen topscorers met meer dan 1 doelpunt"
+         Height          =   495
+         Left            =   240
+         TabIndex        =   50
+         Top             =   240
+         Value           =   1  'Checked
+         Width           =   2535
+      End
+   End
    Begin VB.PictureBox picCompetitorList 
       Appearance      =   0  'Flat
       BeginProperty Font 
@@ -513,11 +530,11 @@ Begin VB.Form frmPrintDialog
       Height          =   4395
       Left            =   75
       ScaleHeight     =   4365
-      ScaleWidth      =   2850
+      ScaleWidth      =   2970
       TabIndex        =   0
       Tag             =   "afdruk"
       Top             =   90
-      Width           =   2880
+      Width           =   3000
       Begin VB.OptionButton optPrintDoc 
          Appearance      =   0  'Flat
          Caption         =   "Plaats per dag"
@@ -619,7 +636,7 @@ Begin VB.Form frmPrintDialog
          Left            =   90
          TabIndex        =   3
          Top             =   3960
-         Width           =   2670
+         Width           =   1815
       End
       Begin VB.OptionButton optPrintDoc 
          Appearance      =   0  'Flat
@@ -855,6 +872,7 @@ Dim sqlstr As String
 Me.picCompetitorList.Visible = False
 Me.optPrintDoc(Index).value = True
 
+Me.frmTS.Visible = Index = 8
 
 Select Case Index
   Case 0 'inschrijf formulieren
@@ -944,8 +962,20 @@ Select Case Index
     toMatch = Me.cmbMatchesPlayed.ItemData(Me.cmbMatchesPlayed.ListIndex)
 
   Case 8
-    'samenvatting stand
     'Stand in toernooi
+    'check number of scorers
+    sqlstr = "SELECT playerId"
+    sqlstr = sqlstr & " From tblMatchEvents"
+    sqlstr = sqlstr & " GROUP BY tblMatchEvents.tournamentId, tblMatchEvents.eventId, tblMatchEvents.playerId"
+    sqlstr = sqlstr & " HAVING tournamentId=17 AND tblMatchEvents.eventId<=2"
+    'checkbox topscorers visible?
+    If getCount(sqlstr, cn) > 60 Then
+      Me.frmTS.Visible = True
+      Me.chkTopTS.value = 1
+    Else
+      Me.frmTS.Visible = False
+      Me.chkTopTS.value = 0
+    End If
     Me.picToMatch.Visible = False
     Me.picVoorWed.Visible = False
     Me.picVolgorde.Visible = False
@@ -3811,6 +3841,7 @@ Dim newYpos As Integer
 Dim yPos As Integer
 Dim edYpos As Integer
 Dim aantpos As Integer
+Dim singleGoals As Integer
 Dim col(5) As Integer
     col(0) = 50
     col(1) = (printObj.ScaleWidth - col(0)) / 5
@@ -3858,48 +3889,36 @@ Dim col(5) As Integer
         printObj.FontBold = False
         printObj.ForeColor = 1
         fontSizing 8
+        singleGoals = 0
         Do While Not rs.EOF
-'            i = i + 1
-'            printObj.CurrentX = col(colNu)
-'            printObj.Print Left(rs!nickName, 12) & " (" & LCase(rs!teamshortname) & ")";
-'            printObj.CurrentX = col(colNu) + aantpos - printObj.TextWidth("1234567890")
-'            printObj.Print rs!cnt
-'            newYpos = printObj.CurrentY
-'
-'
-'            rs.MoveNext
-'            If colNu = 5 Then
-'              colNu = 0
-'              printObj.Print
-'            End If
-'
-'            If i = Int(rs.RecordCount / 5) And Not rs.EOF Then
-'                i = 0
-'                colNu = colNu + 1
-'                printObj.CurrentY = yPos
-'            End If
+          If rs!cnt > 1 Or Me.chkTopTS = 0 Then
             printObj.CurrentX = col(colNu)
             printObj.Print Left(rs!nickName, 20) & " (" & LCase(rs!teamshortname) & ")";
-            printObj.CurrentX = col(colNu) + aantpos - printObj.TextWidth("1234567890")
+            printObj.CurrentX = col(colNu) + aantpos - printObj.TextWidth("123456789") - printObj.TextWidth(rs!cnt)
             printObj.Print rs!cnt;
-
-            rs.MoveNext
             colNu = colNu + 1
             If colNu = 5 Then
               colNu = 0
               printObj.Print
             End If
-'            If i = Int((rs.RecordCount) / 5) + 1 And Not rs.EOF Then
-'                i = 0
-'                colNu = colNu + 1
-'                newYpos = printObj.CurrentY
-'                printObj.CurrentY = yPos
-'            End If
-
+          Else
+            singleGoals = singleGoals + 1
+          End If
+          rs.MoveNext
         Loop
+        'if not showing all topscorers then show the amount of scorers with one goal
+        If singleGoals > 0 Then
+          printObj.CurrentX = col(colNu)
+          printObj.Print "Spelers met 1 doelpunt: ";
+          printObj.CurrentX = col(colNu) + aantpos - printObj.TextWidth("123456789") - printObj.TextWidth(singleGoals)
+          printObj.Print singleGoals;
+        End If
         printObj.Print
         newYpos = printObj.CurrentY
-
+        For i = 1 To 4
+          printObj.Line (col(i) - 50, yPos)-(col(i) - 50, newYpos), lineColor
+        Next
+        printObj.Line (col(0), newYpos + 20)-(col(5), newYpos + 20)
         If rsED.RecordCount > 0 Then
             printObj.CurrentY = newYpos
             printObj.ForeColor = vbBlue
@@ -3925,12 +3944,6 @@ Dim col(5) As Integer
                   colNu = 0
                   printObj.Print
                 End If
-'                If i = Int(rsED.RecordCount / 5) + 1 And Not rsED.EOF Then
-'                    i = 0
-'                    colNu = colNu + 1
-'                    newYpos = printObj.CurrentY
-'                    printObj.CurrentY = edYpos
-'                End If
             Loop
             rsED.Close
             printObj.Print
@@ -4476,12 +4489,13 @@ Sub updateForm()
 Dim i As Integer
 Dim prntr As Printer
 Dim matchDate As Date
+Dim sqlstr As String
 Dim lastMatch As Integer 'last match ORDER number
 'set some controls on the right place
   Me.picCompetitorList.Top = 90
   Me.picCompetitorList.Left = 3090
   Me.picPrnterSettings.Left = 3090
-  Me.picPrnterSettings.Top = 2760
+  Me.picPrnterSettings.Top = 2880
 
   cmbPrinters.Clear
   'Load the combo with all available printers

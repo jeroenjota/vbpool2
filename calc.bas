@@ -1116,7 +1116,7 @@ Dim rs As ADODB.Recordset
         prizes(J) = prizes(J) + getPrizeMoney(i, cn)
       End If
     Next
-    prizes(J) = prizes(J) / cnt
+    If cnt > 0 Then prizes(J) = prizes(J) / cnt
     Do While Not rs.EOF
       rs!moneyDaytotal = rs!moneyDaytotal + prizes(J)
       rs!moneyTotal = rs!moneyTotal + prizes(J)
