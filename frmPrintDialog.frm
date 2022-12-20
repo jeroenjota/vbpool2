@@ -766,15 +766,15 @@ Me.Hide
   sqlstr = "SELECT * FROM qryStickers"
   sqlstr = sqlstr & " WHERE t.tournamentID=" & thisTournament
   sqlstr = sqlstr & " AND cp.matchOrder=" & getMatchCount(0, cn)
-
-  'set the connection to the data
-  mrgConn = "Provider=Microsoft.ACE.OLEDB.12.0;User ID=Admin;Data Source=" & dbNaam
-  mrgConn = mrgConn & ";Mode=Read;Jet OLEDB:System database="""""
-  mrgConn = mrgConn & ";Jet OLEDB:Registry Path="""";Jet OLEDB:Engine Type=5;Jet OLEDB:Database Locking Mode=0;Jet"
+  sqlstr = sqlstr & " order by nickName"
   'get the amount of records
   rs.Open sqlstr, cn, adOpenKeyset, adLockReadOnly
   etikAant = rs.RecordCount
   rs.Close
+  'set the connection to the data
+  mrgConn = "Provider=Microsoft.ACE.OLEDB.12.0;User ID=Admin;Data Source=" & dbNaam
+  mrgConn = mrgConn & ";Mode=Read;Jet OLEDB:System database="""""
+  mrgConn = mrgConn & ";Jet OLEDB:Registry Path="""";Jet OLEDB:Engine Type=5;Jet OLEDB:Database Locking Mode=0;Jet"
   'open the doc
   Set wDoc = wdApp.Documents.Open(App.Path & "\" & etikNaam)
   'copy the cells of the table
